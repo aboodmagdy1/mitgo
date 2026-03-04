@@ -3,150 +3,186 @@
 namespace App\Filament\Widgets;
 
 use App\Models\User;
-use App\Models\Driver;
-use App\Models\Trip;
+use App\Support\DashboardDateFilter;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class AdvancedDashboardStatsWidget extends BaseWidget
 {
     protected static ?int $sort = 1;
-    
+
+    protected static int $cacheTtlSeconds = 300;
+
+    protected $listeners = ['dashboard-filter-changed' => 'onFilterChanged'];
+
+    /**
+     * Disable auto-polling; dashboard uses cache.
+     */
+    protected static ?string $pollingInterval = null;
+
+    public int $filterVersion = 0;
+
+    public function onFilterChanged(): void
+    {
+        $this->cachedStats = null;
+        $this->filterVersion++;
+    }
+
+    private function rememberStats(string $cacheKey): array
+    {
+        try {
+            return Cache::store('redis')->remember(
+                $cacheKey,
+                self::$cacheTtlSeconds,
+                fn () => $this->computeStatsData()
+            );
+        } catch (\Throwable) {
+            return Cache::remember(
+                $cacheKey,
+                self::$cacheTtlSeconds,
+                fn () => $this->computeStatsData()
+            );
+        }
+    }
+
+    /**
+     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return Builder<\Illuminate\Database\Eloquent\Model>
+     */
+    protected function dateScope(Builder $query): Builder
+    {
+        $range = DashboardDateFilter::getDateRange();
+
+        if ($range === null) {
+            return $query;
+        }
+
+        return $query->whereBetween('created_at', $range);
+    }
+
     protected function getStats(): array
     {
-        return [
-            $this->getTotalTripsStats(),
-            $this->getActiveTripsStats(),
-            $this->getTotalDriversStats(),
-            $this->getActiveDriversStats(),
-            $this->getTotalClientsStats(),
-            $this->getCompletedTripsStats(),
-            $this->getTotalRevenueStats(),
-            $this->getCancelledTripsStats(),
-        ];
+        $cacheKey = 'dashboard:advanced_stats:' . DashboardDateFilter::getCacheKeySuffix();
+
+        $data = $this->rememberStats($cacheKey);
+
+        return $this->buildStatsFromData($data);
     }
 
-    private function getTotalTripsStats(): Stat
+    /**
+     * Single aggregated query: 6+ round-trips → 1.
+     *
+     * @return array<string, int>
+     */
+    private function computeStatsData(): array
     {
-        $total = Trip::count();
-        $thisMonth = Trip::whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->count();
-        
-        return Stat::make(__('stats.total_trips'), number_format($total))
-            ->description(__('stats.trips_this_month', ['count' => number_format($thisMonth)]))
-            ->descriptionIcon('heroicon-m-map-pin')
-            ->color('primary');
-    }
+        $range = DashboardDateFilter::getDateRange();
 
-    private function getActiveTripsStats(): Stat
-    {
-        $activeTrips = Trip::whereIn('status', [
+        $activeStatuses = [
             \App\Enums\TripStatus::SEARCHING->value,
             \App\Enums\TripStatus::IN_ROUTE_TO_PICKUP->value,
             \App\Enums\TripStatus::PICKUP_ARRIVED->value,
-            \App\Enums\TripStatus::IN_PROGRESS->value
-        ])->count();
-        
-        $scheduledTrips = Trip::where('status', \App\Enums\TripStatus::SCHEDULED->value)->count();
-        
-        return Stat::make(__('stats.active_trips'), number_format($activeTrips))
-            ->description(__('stats.scheduled_trips_count', ['count' => number_format($scheduledTrips)]))
-            ->descriptionIcon('heroicon-m-clock')
-            ->color('warning');
-    }
-
-    private function getTotalDriversStats(): Stat
-    {
-        $total = Driver::count();
-        $newThisMonth = Driver::whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->count();
-        
-        return Stat::make(__('stats.total_drivers'), number_format($total))
-            ->description(__('stats.new_drivers_this_month', ['count' => number_format($newThisMonth)]))
-            ->descriptionIcon('heroicon-m-user-circle')
-            ->color('success');
-    }
-
-    private function getActiveDriversStats(): Stat
-    {
-        $onlineDrivers = Driver::where('status', 1)->count();
-        $withVehicles = Driver::whereHas('vehicle')->count();
-        
-        return Stat::make(__('stats.online_drivers'), number_format($onlineDrivers))
-            ->description(__('stats.drivers_with_vehicles', ['count' => number_format($withVehicles)]))
-            ->descriptionIcon('heroicon-m-truck')
-            ->color('info');
-    }
-
-    private function getTotalClientsStats(): Stat
-    {
-        $totalClients = User::whereHas('roles', function ($query) {
-            $query->where('name', 'client');
-        })->count();
-        
-        $activeClients = User::whereHas('roles', function ($query) {
-            $query->where('name', 'client');
-        })->where('is_active', true)->count();
-        
-        return Stat::make(__('stats.total_clients'), number_format($totalClients))
-            ->description(__('stats.active_clients_count', ['count' => number_format($activeClients)]))
-            ->descriptionIcon('heroicon-m-users')
-            ->color('success');
-    }
-
-    private function getCompletedTripsStats(): Stat
-    {
-        $completedTrips = Trip::where('status', \App\Enums\TripStatus::PAID->value)->count();
-        $thisMonth = Trip::where('status', \App\Enums\TripStatus::PAID->value)
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->count();
-        
-        return Stat::make(__('stats.completed_trips'), number_format($completedTrips))
-            ->description(__('stats.completed_this_month', ['count' => number_format($thisMonth)]))
-            ->descriptionIcon('heroicon-m-check-circle')
-            ->color('success');
-    }
-
-    private function getTotalRevenueStats(): Stat
-    {
-        $totalRevenue = Trip::where('status', \App\Enums\TripStatus::PAID->value)
-            ->sum('actual_fare') ?? 0;
-        
-        $thisMonthRevenue = Trip::where('status', \App\Enums\TripStatus::PAID->value)
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->sum('actual_fare') ?? 0;
-        
-        return Stat::make(__('stats.total_revenue'), number_format($totalRevenue, 2) . ' ' . __('SAR'))
-            ->description(__('stats.revenue_this_month', ['amount' => number_format($thisMonthRevenue, 2)]))
-            ->descriptionIcon('heroicon-m-banknotes')
-            ->color('success');
-    }
-
-    private function getCancelledTripsStats(): Stat
-    {
-        $cancelledTrips = Trip::whereIn('status', [
+            \App\Enums\TripStatus::IN_PROGRESS->value,
+        ];
+        $cancelledStatuses = [
             \App\Enums\TripStatus::CANCELLED_BY_DRIVER->value,
             \App\Enums\TripStatus::CANCELLED_BY_RIDER->value,
-            \App\Enums\TripStatus::CANCELLED_BY_SYSTEM->value
-        ])->count();
-        
-        $thisMonth = Trip::whereIn('status', [
-            \App\Enums\TripStatus::CANCELLED_BY_DRIVER->value,
-            \App\Enums\TripStatus::CANCELLED_BY_RIDER->value,
-            \App\Enums\TripStatus::CANCELLED_BY_SYSTEM->value
-        ])->whereMonth('created_at', Carbon::now()->month)
-          ->whereYear('created_at', Carbon::now()->year)
-          ->count();
-        
-        return Stat::make(__('stats.cancelled_trips'), number_format($cancelledTrips))
-            ->description(__('stats.cancelled_this_month', ['count' => number_format($thisMonth)]))
-            ->descriptionIcon('heroicon-m-x-circle')
-            ->color('danger');
+            \App\Enums\TripStatus::CANCELLED_BY_SYSTEM->value,
+        ];
+
+        $tripDateClause = $range ? ' AND created_at BETWEEN ? AND ?' : '';
+        $completedDateClause = $range ? ' AND ended_at BETWEEN ? AND ?' : '';
+        $driverDateClause = $range ? ' AND drivers.created_at BETWEEN ? AND ?' : '';
+        $userDateClause = $range ? ' AND users.created_at BETWEEN ? AND ?' : '';
+
+        $activeList = implode(',', $activeStatuses);
+        $cancelledList = implode(',', $cancelledStatuses);
+        $userModel = User::class;
+
+        $sql = "
+            SELECT
+                (SELECT COUNT(*) FROM trips WHERE 1=1 {$tripDateClause}) AS total_trips,
+                (SELECT COALESCE(SUM(CASE WHEN status IN ({$activeList}) THEN 1 ELSE 0 END), 0) FROM trips WHERE 1=1 {$tripDateClause}) AS active_trips,
+                (SELECT COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) FROM trips WHERE 1=1 {$tripDateClause}) AS scheduled_trips,
+                (SELECT COALESCE(SUM(CASE WHEN status IN ({$cancelledList}) THEN 1 ELSE 0 END), 0) FROM trips WHERE 1=1 {$tripDateClause}) AS cancelled_trips,
+                (SELECT COUNT(*) FROM trips WHERE status = ? {$completedDateClause}) AS completed_trips,
+                (SELECT COUNT(*) FROM drivers WHERE 1=1 {$driverDateClause}) AS total_drivers,
+                (SELECT COUNT(*) FROM users
+                    INNER JOIN model_has_roles ON users.id = model_has_roles.model_id AND model_has_roles.model_type = ?
+                    INNER JOIN roles ON model_has_roles.role_id = roles.id AND roles.name = 'client'
+                    WHERE 1=1 {$userDateClause}) AS total_clients,
+                (SELECT COUNT(*) FROM users
+                    INNER JOIN model_has_roles ON users.id = model_has_roles.model_id AND model_has_roles.model_type = ?
+                    INNER JOIN roles ON model_has_roles.role_id = roles.id AND roles.name = 'client'
+                    WHERE users.is_active = 1 {$userDateClause}) AS active_clients
+        ";
+
+        $bindingsOrdered = $range
+            ? array_merge(
+                [$range[0], $range[1]], // total_trips
+                [$range[0], $range[1]], // active_trips
+                [\App\Enums\TripStatus::SCHEDULED->value, $range[0], $range[1]], // scheduled_trips
+                [$range[0], $range[1]], // cancelled_trips
+                [\App\Enums\TripStatus::COMPLETED->value, $range[0], $range[1]], // completed_trips
+                [$range[0], $range[1]], // total_drivers
+                [$userModel, $range[0], $range[1]], // total_clients
+                [$userModel, $range[0], $range[1]], // active_clients
+            )
+            : [
+                \App\Enums\TripStatus::SCHEDULED->value,
+                \App\Enums\TripStatus::COMPLETED->value,
+                $userModel,
+                $userModel,
+            ];
+
+        $row = DB::selectOne($sql, $bindingsOrdered);
+
+        return [
+            'total_trips' => (int) ($row->total_trips ?? 0),
+            'active_trips' => (int) ($row->active_trips ?? 0),
+            'scheduled_trips' => (int) ($row->scheduled_trips ?? 0),
+            'cancelled_trips' => (int) ($row->cancelled_trips ?? 0),
+            'completed_trips' => (int) ($row->completed_trips ?? 0),
+            'total_drivers' => (int) ($row->total_drivers ?? 0),
+            'total_clients' => (int) ($row->total_clients ?? 0),
+            'active_clients' => (int) ($row->active_clients ?? 0),
+        ];
+    }
+
+    /**
+     * @param  array<string, int>  $data
+     * @return array<Stat>
+     */
+    private function buildStatsFromData(array $data): array
+    {
+        return [
+            Stat::make(__('stats.total_trips'), number_format($data['total_trips']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.trips_in_period') : __('stats.all_time'))
+                ->descriptionIcon('heroicon-m-map-pin')
+                ->color('primary'),
+            Stat::make(__('stats.active_trips'), number_format($data['active_trips']))
+                ->description(__('stats.scheduled_trips_count', ['count' => number_format($data['scheduled_trips'])]))
+                ->descriptionIcon('heroicon-m-clock')
+                ->color('warning'),
+            Stat::make(__('stats.total_drivers'), number_format($data['total_drivers']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.drivers_in_period') : __('stats.all_time'))
+                ->descriptionIcon('heroicon-m-user-circle')
+                ->color('success'),
+            Stat::make(__('stats.total_clients'), number_format($data['total_clients']))
+                ->description(__('stats.active_clients_count', ['count' => number_format($data['active_clients'])]))
+                ->descriptionIcon('heroicon-m-users')
+                ->color('success'),
+            Stat::make(__('stats.completed_trips'), number_format($data['completed_trips']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.completed_in_period') : __('stats.all_time'))
+                ->descriptionIcon('heroicon-m-check-circle')
+                ->color('success'),
+            Stat::make(__('stats.cancelled_trips'), number_format($data['cancelled_trips']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.cancelled_in_period') : __('stats.all_time'))
+                ->descriptionIcon('heroicon-m-x-circle')
+                ->color('danger'),
+        ];
     }
 }
