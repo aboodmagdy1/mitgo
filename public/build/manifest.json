@@ -1,0 +1,39 @@
+{
+  "_pusher-CWzgSNfj.js": {
+    "file": "assets/pusher-CWzgSNfj.js",
+    "name": "pusher"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-BlEiSB93.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/custom.css": {
+    "file": "assets/custom-Cebtx999.css",
+    "src": "resources/css/custom.css",
+    "isEntry": true
+  },
+  "resources/css/filament/admin/theme.css": {
+    "file": "assets/theme-C5GRmTV_.css",
+    "src": "resources/css/filament/admin/theme.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-rOkI_DoI.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_pusher-CWzgSNfj.js"
+    ]
+  },
+  "resources/js/echo.js": {
+    "file": "assets/echo-DhIWMVGH.js",
+    "name": "echo",
+    "src": "resources/js/echo.js",
+    "isEntry": true,
+    "imports": [
+      "_pusher-CWzgSNfj.js"
+    ]
+  }
+}

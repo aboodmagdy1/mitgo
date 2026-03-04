@@ -1,0 +1,50 @@
+/* Custom PUIUX Button Styles */
+.btn-puiux {
+    background-color: #d82323;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-puiux:hover {
+    background-color: #1fc653;
+}
+
+.btn-puiux:active {
+    background-color: #1bb34f;
+}
+
+/* Additional utility classes for GrapesJS */
+.btn-puiux-outline {
+    background-color: transparent;
+    color: #23d859;
+    border: 2px solid #23d859;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-puiux-outline:hover {
+    background-color: #23d859;
+    color: white;
+}
+
+.btn-puiux-large {
+    padding: 12px 24px;
+    font-size: 1.1em;
+}
+
+.btn-puiux-small {
+    padding: 4px 8px;
+    font-size: 0.9em;
+}
+
+.puiux{
+    background-color: #000000;
+}

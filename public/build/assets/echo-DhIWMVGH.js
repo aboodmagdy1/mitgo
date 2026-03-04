@@ -1,0 +1,1 @@
+import{P as t,E as r}from"./pusher-CWzgSNfj.js";window.Pusher=t;var e;window.Echo=new r({broadcaster:"pusher",key:void 0,cluster:void 0,forceTLS:!0,encrypted:!0,enabledTransports:["ws","wss"],disableStats:!0,authEndpoint:"/broadcasting/auth",auth:{headers:{"X-CSRF-TOKEN":(e=document.querySelector('meta[name="csrf-token"]'))==null?void 0:e.getAttribute("content")}}});

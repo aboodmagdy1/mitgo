@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Server Test - Interactive Map</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+        }
+
+        .status span {
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            font-weight: 500;
+        }
+
+        .status .connected {
+            background: #10b981;
+        }
+
+        .status .disconnected {
+            background: #ef4444;
+        }
+
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .map-section {
+            flex: 2;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .control-section {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            border-left: 1px solid #e5e7eb;
+        }
+
+        .config-panel {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .config-panel h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .config-panel input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .config-panel input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .controls {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .controls h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .controls button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #send-location {
+            background: #3b82f6;
+            color: white;
+        }
+
+        #send-location:hover {
+            background: #2563eb;
+        }
+
+        #start-simulation {
+            background: #10b981;
+            color: white;
+        }
+
+        #start-simulation:hover {
+            background: #059669;
+        }
+
+        #stop-simulation {
+            background: #ef4444;
+            color: white;
+        }
+
+        #stop-simulation:hover {
+            background: #dc2626;
+        }
+
+        #stop-simulation:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .controls select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .stats {
+            padding: 20px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .stats h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        .stats > div {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .stats > div:last-child {
+            border-bottom: none;
+        }
+
+        .stats span {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: #667eea;
+        }
+
+        .log-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-header {
+            padding: 20px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-header h3 {
+            font-size: 16px;
+            color: #667eea;
+        }
+
+        #clear-log {
+            padding: 6px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        #clear-log:hover {
+            background: #dc2626;
+        }
+
+        #event-log {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .log-entry {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            border-left: 3px solid;
+        }
+
+        .log-entry.info {
+            background: #eff6ff;
+            border-left-color: #3b82f6;
+        }
+
+        .log-entry.success {
+            background: #f0fdf4;
+            border-left-color: #10b981;
+        }
+
+        .log-entry.error {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+
+        .log-entry.warning {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        .log-time {
+            color: #9ca3af;
+            font-size: 11px;
+        }
+
+        .pusher-input {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #fef3c7;
+        }
+
+        .pusher-input h3 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        .pusher-input input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            border: 1px solid #fbbf24;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .pusher-input small {
+            color: #92400e;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📍 Location Server Test Interface</h1>
+            <div class="status">
+                <span id="socket-status">Socket.IO: ⏳ Connecting...</span>
+                <span id="pusher-status">Pusher: ⏳ Connecting...</span>
+                <span id="server-url" style="background: rgba(255,255,255,0.15); font-size: 12px;">Server: ...</span>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="main">
+            <!-- Left: Map -->
+            <div class="map-section">
+                <div id="map"></div>
+            </div>
+
+            <!-- Right: Controls & Log -->
+            <div class="control-section">
+                <!-- Pusher Config -->
+                <div class="pusher-input">
+                    <h3>⚙️ Pusher Configuration</h3>
+                    <input type="text" id="pusher-key" placeholder="Pusher App Key">
+                    <input type="text" id="pusher-cluster" placeholder="Cluster (e.g., eu)" value="eu">
+                    <button onclick="connectPusher()" style="width: 100%; padding: 8px; background: #f59e0b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Connect to Pusher</button>
+                    <small>Enter your Pusher credentials from .env file</small>
+                </div>
+
+                <!-- Trip Config -->
+                <div class="config-panel">
+                    <h3>🚗 Trip Configuration</h3>
+                    <input type="number" id="trip-id" placeholder="Trip ID" value="123">
+                    <input type="number" id="driver-id" placeholder="Driver ID" value="456">
+                    
+                    <h4 style="margin-top: 15px;">Trip Status</h4>
+                    <select id="trip-status">
+                        <option value="0">No Status (Location Only)</option>
+                        <option value="4">Status 4 - IN_ROUTE_TO_PICKUP</option>
+                        <option value="7">Status 7 - IN_PROGRESS</option>
+                    </select>
+                    
+                    <h4 style="margin-top: 15px;">Pickup Location</h4>
+                    <input type="number" id="pickup-lat" placeholder="Pickup Latitude" step="0.0001" value="24.7200">
+                    <input type="number" id="pickup-long" placeholder="Pickup Longitude" step="0.0001" value="46.6800">
+                    
+                    <h4 style="margin-top: 15px;">Dropoff Location</h4>
+                    <input type="number" id="dropoff-lat" placeholder="Dropoff Latitude" step="0.0001" value="24.7500">
+                    <input type="number" id="dropoff-long" placeholder="Dropoff Longitude" step="0.0001" value="46.7000">
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <h3>🎮 Driver Controls</h3>
+                    <button id="send-location">📍 Send Current Location</button>
+                    <button id="start-simulation">▶️ Start Driver Simulation</button>
+                    <button id="stop-simulation" disabled>⏸️ Stop Driver Simulation</button>
+                    
+                    <h3 style="margin-top: 20px;">🧍 Client/Rider Controls</h3>
+                    <button id="start-client-simulation" style="background: #10b981;">▶️ Start Client Simulation</button>
+                    <button id="stop-client-simulation" style="background: #ef4444;" disabled>⏸️ Stop Client Simulation</button>
+                    
+                    <h3 style="margin-top: 20px;">⚙️ Speed</h3>
+                    <select id="speed">
+                        <option value="3000">Slow (3s)</option>
+                        <option value="1000" selected>Normal (1s)</option>
+                        <option value="500">Fast (0.5s)</option>
+                    </select>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats">
+                    <h3>📊 Statistics</h3>
+                    <div>Driver Sent: <span id="sent-count">0</span></div>
+                    <div>Driver Received: <span id="received-count">0</span></div>
+                    <div>Driver Lat: <span id="current-lat">24.7136</span></div>
+                    <div>Driver Long: <span id="current-long">46.6753</span></div>
+                    <div>Latency: <span id="latency">-</span></div>
+                </div>
+
+                <!-- Distance & Time Display -->
+                <div class="stats" style="background: #f0fdf4; border: 2px solid #10b981;">
+                    <h3>🎯 Distance & Time</h3>
+                    <div>Distance: <span id="distance" style="color: #10b981; font-weight: bold;">-</span></div>
+                    <div>Duration: <span id="duration" style="color: #10b981; font-weight: bold;">-</span></div>
+                    <div>To: <span id="current-status" style="color: #10b981;">-</span></div>
+                    <div style="font-size: 11px; color: #059669; margin-top: 5px;">Updates every 10 seconds</div>
+                </div>
+
+                <!-- Event Log -->
+                <div class="log-panel">
+                    <div class="log-header">
+                        <h3>📋 Event Log</h3>
+                        <button id="clear-log">Clear</button>
+                    </div>
+                    <div id="event-log"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+
+    <script>
+        // Global variables
+        let map, driverMarker, riderMarker, routePolyline;
+        let socket;
+        let pusherInstance;
+        let channel;
+        let simulationInterval;
+        let clientSimulationInterval;
+        let sentCount = 0;
+        let receivedCount = 0;
+        let currentLat = 24.7136; // Riyadh (Driver)
+        let currentLong = 46.6753;
+        let clientLat = 24.7200; // Rider position (slightly north)
+        let clientLong = 46.6800;
+        let locationHistory = [];
+        let clientSentCount = 0;
+        let clientReceivedCount = 0;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([currentLat, currentLong], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Create custom driver icon
+            const driverIcon = L.divIcon({
+                className: 'driver-marker',
+                html: '<div style="background: #3b82f6; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">🚗</div>',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+
+            // Create driver marker
+            driverMarker = L.marker([currentLat, currentLong], { icon: driverIcon })
+                .addTo(map)
+                .bindPopup('Driver Position');
+
+            // Create custom rider/client icon
+            const riderIcon = L.divIcon({
+                className: 'rider-marker',
+                html: '<div style="background: #10b981; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">🧍</div>',
+                iconSize: [40, 40],
+                iconAnchor: [20, 20]
+            });
+
+            // Create rider marker
+            riderMarker = L.marker([clientLat, clientLong], { icon: riderIcon })
+                .addTo(map)
+                .bindPopup('Rider/Client Position');
+
+            // Initialize empty route polyline
+            routePolyline = L.polyline([], { color: '#3b82f6', weight: 3 }).addTo(map);
+
+            // Fit map to show both markers
+            const bounds = L.latLngBounds([
+                [currentLat, currentLong],
+                [clientLat, clientLong]
+            ]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+
+            logEvent('info', 'Map initialized with driver and rider positions');
+        }
+
+        // Connect to Socket.IO
+        function connectSocket() {
+            try {
+                // Auto-detect server URL (same as current page host)
+                // In production: https://location.saudi-driver.com
+                // In development: http://localhost:3000
+                const serverUrl = window.location.origin;
+                
+                console.log('Connecting to Socket.IO server:', serverUrl);
+                
+                // Display server URL in UI
+                document.getElementById('server-url').textContent = `Server: ${serverUrl}`;
+                logEvent('info', `Connecting to: ${serverUrl}`);
+                
+                // Connect to the location server
+                socket = io(serverUrl, {
+                    transports: ['websocket', 'polling'],
+                    reconnection: true,
+                    reconnectionDelay: 1000,
+                    reconnectionAttempts: 5
+                });
+
+                socket.on('connect', () => {
+                    document.getElementById('socket-status').textContent = 'Socket.IO: ✓ Connected';
+                    document.getElementById('socket-status').className = 'connected';
+                    logEvent('success', `Socket.IO connected - ID: ${socket.id} (${serverUrl})`);
+                });
+
+                socket.on('disconnect', () => {
+                    document.getElementById('socket-status').textContent = 'Socket.IO: ✗ Disconnected';
+                    document.getElementById('socket-status').className = 'disconnected';
+                    logEvent('error', 'Socket.IO disconnected');
+                });
+
+                socket.on('connect_error', (error) => {
+                    document.getElementById('socket-status').textContent = 'Socket.IO: ✗ Connection Error';
+                    document.getElementById('socket-status').className = 'disconnected';
+                    logEvent('error', `Socket.IO connection error: ${error.message}`);
+                });
+
+                socket.on('location_received', (data) => {
+                    logEvent('success', `Location broadcast confirmed for trip ${data.trip_id}`);
+                });
+
+                socket.on('error', (error) => {
+                    logEvent('error', `Socket error: ${error.message || error}`);
+                });
+
+                socket.on('error', (error) => {
+                    logEvent('error', `Socket error: ${error.message || error}`);
+                });
+            } catch (error) {
+                logEvent('error', `Failed to initialize Socket.IO: ${error.message}`);
+            }
+        }
+
+        // Connect to Pusher
+        function connectPusher() {
+            const key = document.getElementById('pusher-key').value;
+            const cluster = document.getElementById('pusher-cluster').value;
+
+            if (!key) {
+                logEvent('error', 'Please enter Pusher App Key');
+                return;
+            }
+
+            pusherInstance = new Pusher(key, {
+                cluster: cluster
+            });
+
+            const tripId = document.getElementById('trip-id').value;
+            channel = pusherInstance.subscribe(`trip.${tripId}`);
+
+            channel.bind('pusher:subscription_succeeded', () => {
+                document.getElementById('pusher-status').textContent = 'Pusher: ✓ Subscribed';
+                document.getElementById('pusher-status').className = 'connected';
+                logEvent('success', `Subscribed to trip.${tripId} channel`);
+            });
+
+            channel.bind('driver_location_updated', (data) => {
+                receivedCount++;
+                document.getElementById('received-count').textContent = receivedCount;
+                
+                updateDriverMarker(data.lat, data.long);
+                
+                const latency = Date.now() - data.timestamp;
+                document.getElementById('latency').textContent = `${latency}ms`;
+                
+                logEvent('info', `Driver location received: ${data.lat.toFixed(4)}, ${data.long.toFixed(4)} (${latency}ms)`);
+            });
+
+            channel.bind('client_location_updated', (data) => {
+                clientReceivedCount++;
+                
+                updateRiderMarker(data.lat, data.long);
+                
+                const latency = Date.now() - data.timestamp;
+                
+                logEvent('info', `Client location received: ${data.lat.toFixed(4)}, ${data.long.toFixed(4)} (${latency}ms)`);
+            });
+
+            // Listen for distance/time updates
+            channel.bind('trip_distance_updated', (data) => {
+                document.getElementById('distance').textContent = data.distance_km.toFixed(2) + ' km';
+                document.getElementById('duration').textContent = data.duration_minutes.toFixed(1) + ' min';
+                
+                const statusText = data.destination_type === 'pickup' ? 'Pickup Location' : 'Dropoff Location';
+                document.getElementById('current-status').textContent = statusText;
+                
+                logEvent('success', `📍 Distance: ${data.distance_km.toFixed(2)}km, Time: ${data.duration_minutes.toFixed(1)}min to ${data.destination_type}`);
+            });
+        }
+
+        // Send driver location
+        function sendLocation(lat, long) {
+            // Check if socket is connected
+            if (!socket || !socket.connected) {
+                logEvent('error', 'Socket.IO not connected! Please wait for connection.');
+                alert('Socket.IO is not connected. Please wait a moment and try again.');
+                return;
+            }
+
+            const tripId = document.getElementById('trip-id').value;
+            const driverId = document.getElementById('driver-id').value;
+            const tripStatus = parseInt(document.getElementById('trip-status').value);
+            const pickupLat = parseFloat(document.getElementById('pickup-lat').value);
+            const pickupLong = parseFloat(document.getElementById('pickup-long').value);
+            const dropoffLat = parseFloat(document.getElementById('dropoff-lat').value);
+            const dropoffLong = parseFloat(document.getElementById('dropoff-long').value);
+
+            const locationData = {
+                trip_id: parseInt(tripId),
+                driver_id: parseInt(driverId),
+                lat: lat,
+                long: long
+            };
+
+            // Add trip status and coordinates if status is selected
+            if (tripStatus && tripStatus !== 0) {
+                locationData.trip_status = tripStatus;
+                locationData.pickup_lat = pickupLat;
+                locationData.pickup_long = pickupLong;
+                locationData.dropoff_lat = dropoffLat;
+                locationData.dropoff_long = dropoffLong;
+            }
+
+            socket.emit('driver_location', locationData);
+            
+            sentCount++;
+            document.getElementById('sent-count').textContent = sentCount;
+            document.getElementById('current-lat').textContent = lat.toFixed(6);
+            document.getElementById('current-long').textContent = long.toFixed(6);
+
+            const statusText = tripStatus === 4 ? ' (to pickup)' : tripStatus === 7 ? ' (to dropoff)' : '';
+            logEvent('warning', `Sending driver location: ${lat.toFixed(4)}, ${long.toFixed(4)}${statusText}`);
+        }
+
+        // Send client location
+        function sendClientLocation(lat, long) {
+            // Check if socket is connected
+            if (!socket || !socket.connected) {
+                logEvent('error', 'Socket.IO not connected! Please wait for connection.');
+                return;
+            }
+
+            const tripId = document.getElementById('trip-id').value;
+            const userId = 999; // Example user ID
+
+            const locationData = {
+                trip_id: parseInt(tripId),
+                user_id: userId,
+                lat: lat,
+                long: long
+            };
+
+            socket.emit('client_location', locationData);
+            
+            clientSentCount++;
+
+            logEvent('info', `Sending client location: ${lat.toFixed(4)}, ${long.toFixed(4)}`);
+        }
+
+        // Update driver marker on map
+        function updateDriverMarker(lat, long) {
+            driverMarker.setLatLng([lat, long]);
+            
+            // Add to route history
+            locationHistory.push([lat, long]);
+            routePolyline.setLatLngs(locationHistory);
+            
+            // Keep route history limited
+            if (locationHistory.length > 100) {
+                locationHistory.shift();
+            }
+        }
+
+        // Update rider marker on map
+        function updateRiderMarker(lat, long) {
+            riderMarker.setLatLng([lat, long]);
+        }
+
+        // Start simulation
+        function startSimulation() {
+            const speed = parseInt(document.getElementById('speed').value);
+            
+            document.getElementById('start-simulation').disabled = true;
+            document.getElementById('stop-simulation').disabled = false;
+            
+            logEvent('success', `Simulation started (interval: ${speed}ms)`);
+            
+            simulationInterval = setInterval(() => {
+                // Simulate realistic movement (random walk)
+                const deltaLat = (Math.random() - 0.5) * 0.001; // ~50 meters
+                const deltaLong = (Math.random() - 0.5) * 0.001;
+                
+                currentLat += deltaLat;
+                currentLong += deltaLong;
+                
+                sendLocation(currentLat, currentLong);
+            }, speed);
+        }
+
+        // Stop simulation
+        function stopSimulation() {
+            clearInterval(simulationInterval);
+            
+            document.getElementById('start-simulation').disabled = false;
+            document.getElementById('stop-simulation').disabled = true;
+            
+            logEvent('warning', 'Driver simulation stopped');
+        }
+
+        // Start client simulation
+        function startClientSimulation() {
+            const speed = parseInt(document.getElementById('speed').value);
+            
+            document.getElementById('start-client-simulation').disabled = true;
+            document.getElementById('stop-client-simulation').disabled = false;
+            
+            logEvent('success', `Client simulation started (interval: ${speed}ms)`);
+            
+            clientSimulationInterval = setInterval(() => {
+                // Simulate realistic movement (random walk)
+                const deltaLat = (Math.random() - 0.5) * 0.0005; // Slower movement
+                const deltaLong = (Math.random() - 0.5) * 0.0005;
+                
+                clientLat += deltaLat;
+                clientLong += deltaLong;
+                
+                sendClientLocation(clientLat, clientLong);
+            }, speed);
+        }
+
+        // Stop client simulation
+        function stopClientSimulation() {
+            clearInterval(clientSimulationInterval);
+            
+            document.getElementById('start-client-simulation').disabled = false;
+            document.getElementById('stop-client-simulation').disabled = true;
+            
+            logEvent('warning', 'Client simulation stopped');
+        }
+
+        // Log event
+        function logEvent(type, message) {
+            const log = document.getElementById('event-log');
+            const time = new Date().toLocaleTimeString();
+            
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+            
+            log.insertBefore(entry, log.firstChild);
+            
+            // Keep log limited
+            while (log.children.length > 100) {
+                log.removeChild(log.lastChild);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('send-location').addEventListener('click', () => {
+            sendLocation(currentLat, currentLong);
+        });
+
+        document.getElementById('start-simulation').addEventListener('click', startSimulation);
+        document.getElementById('stop-simulation').addEventListener('click', stopSimulation);
+        
+        document.getElementById('start-client-simulation').addEventListener('click', startClientSimulation);
+        document.getElementById('stop-client-simulation').addEventListener('click', stopClientSimulation);
+
+        document.getElementById('clear-log').addEventListener('click', () => {
+            document.getElementById('event-log').innerHTML = '';
+            logEvent('info', 'Log cleared');
+        });
+
+        // Click on map to set driver position
+        if (map) {
+            map.on('click', (e) => {
+                currentLat = e.latlng.lat;
+                currentLong = e.latlng.lng;
+                driverMarker.setLatLng([currentLat, currentLong]);
+                logEvent('info', `Driver position updated via map click: ${currentLat.toFixed(4)}, ${currentLong.toFixed(4)}`);
+            });
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            initMap();
+            connectSocket();
+            logEvent('info', 'Application initialized. Enter Pusher credentials and connect.');
+        });
+    </script>
+</body>
+</html>
+

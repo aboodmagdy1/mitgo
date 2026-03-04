@@ -1,0 +1,49 @@
+.btn-puiux {
+    background-color: #d82323 !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease !important;
+    font-weight: 500 !important;
+}
+
+.btn-puiux:hover {
+    background-color: #1fc653 !important;
+}
+
+.btn-puiux:active {
+    background-color: #1bb34f !important;
+}
+
+/* Additional utility classes for GrapesJS */
+.btn-puiux-outline {
+    background-color: transparent !important;
+    color: #23d859 !important;
+    border: 2px solid #23d859 !important;
+    padding: 6px 14px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-weight: 500 !important;
+}
+
+.btn-puiux-outline:hover {
+    background-color: #23d859 !important;
+    color: white !important;
+}
+
+.btn-puiux-large {
+    padding: 12px 24px !important;
+    font-size: 1.1em !important;
+}
+
+.btn-puiux-small {
+    padding: 4px 8px !important;
+    font-size: 0.9em !important;
+}
+
+.puiux{
+    background-color: #000000 !important;
+}

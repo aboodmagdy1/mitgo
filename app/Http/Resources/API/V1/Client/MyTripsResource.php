@@ -1,0 +1,124 @@
+<?php
+
+namespace App\Http\Resources\API\V1\Client;
+
+use App\Enums\TripStatus;
+use App\Http\Resources\API\V1\Client\TripInvoiceResource;
+use App\Http\Resources\API\V1\Client\TripDriverResource;
+use App\Http\Resources\API\V1\PaymentMethodsResource;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+
+class MyTripsResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        $data = [
+            'trip_id' => $this->id,
+            'status' => [
+                'id' => $this->status?->value,
+                'name' => $this->status?->label('ar'),
+                'name_en' => $this->status?->label('en'),
+            ],            
+            'dropoff' => [
+                'lat' => $this->dropoff_lat,
+                'long' => $this->dropoff_long,
+                'address' => $this->dropoff_address,
+            ],
+            'pickup' => [
+                'lat' => $this->pickup_lat,
+                'long' => $this->pickup_long,
+                'address' => $this->pickup_address,
+            ],
+            'cost' => $this->getCostByStatus(),
+            'created_at_date' => $this->status == TripStatus::SCHEDULED ? Carbon::parse($this->scheduled_date)->translatedFormat('Y M,d') : Carbon::parse($this->created_at)->translatedFormat('Y M,d'),//12 فبراير, 2025
+            'created_at_time' =>  $this->status == TripStatus::SCHEDULED ? Carbon::parse($this->scheduled_time)->translatedFormat('h:i A') : Carbon::parse($this->created_at)->translatedFormat('h:i A'),//12:00 م
+        ];
+        
+        // Include detailed information for trip details view
+        if($request->route()->getName() == 'client.trips.show'){
+            unset($data['cost']);
+            // $data['pickup_address'] = $this->pickup_address;
+            $data['driver'] = $this->driver ? TripDriverResource::make($this->driver) : null;
+            $data['invoice'] = $this->payment ? TripInvoiceResource::make($this) : null;
+        }
+            
+        return $data;
+    }
+
+    /**
+     * Get cost based on trip status
+     */
+    private function getCostByStatus()
+    {
+        return match(true) {
+            // Completed trips - use payment final_amount (what customer actually pays)
+            $this->status === TripStatus::COMPLETED || $this->isCancelled() => 
+                $this->payment?->final_amount ?? $this->payment?->total_amount ?? $this->actual_fare ?? $this->estimated_fare,
+            
+            // Scheduled trips - show estimated fare
+            $this->status === TripStatus::SCHEDULED => 
+                $this->estimated_fare ?? 0,
+            
+            // // Cancelled trips without fee
+            // $this->isCancelled() => 0,
+            
+            // Default - show estimated fare
+            default => 0,   
+        };
+    }
+
+    /**
+     * Get driver data based on trip status
+     */
+    private function getDriverByStatus()
+    {
+        return match(true) {
+            // Completed trips - always show driver
+            $this->status === TripStatus::COMPLETED => 
+                TripDriverResource::make($this->driver),
+            
+            
+            // Scheduled trips - show driver if assigned
+            $this->status === TripStatus::SCHEDULED => 
+                $this->driver ? TripDriverResource::make($this->driver) : null,
+            
+            // Cancelled trips - show driver if was assigned (for reference)
+            $this->isCancelled() => null,
+            
+            // Default - no driver
+            default => null,
+        };
+    }
+
+    /**
+     * Get invoice data based on trip status
+     */
+    private function getInvoiceByStatus()
+    {
+        return match(true) {
+            // Completed trips - show invoice with actual payment data
+            $this->status === TripStatus::COMPLETED => 
+                TripInvoiceResource::make($this),
+            
+            // Scheduled trips - show invoice with estimated values
+            $this->status === TripStatus::SCHEDULED => 
+                TripInvoiceResource::make($this),
+            
+            // Cancelled trips with cancellation fee - show simplified invoice
+            $this->isCancelled() => 
+            // if cancellation fee is 0, show null
+            $this->cancellation_fee == 0 ? null : TripInvoiceResource::make($this),
+            
+            // All other statuses - no invoice yet
+            default => null,
+        };
+    }
+}
+
