@@ -1,69 +1,20 @@
 <?php
 
-namespace App\Filament\Resources\ContactResource\Pages;
+namespace App\Filament\Resources\ContactResource\Concerns;
 
-use App\Filament\Resources\ContactResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ViewRecord;
-use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\Group;
-use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
+use Filament\Infolists\Infolist;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Enums\IconPosition;
 
-class ViewContact extends ViewRecord
+trait HasContactInfolist
 {
-    protected static string $resource = ContactResource::class;
-
-    public function getTitle(): string
-    {
-        return __('Contact Message Details');
-    }
-
-    public function getHeading(): string
-    {
-        return __('Contact from :name', ['name' => $this->record->name]);
-    }
-
-    public function getSubheading(): string
-    {
-        return __('Received on :date', ['date' => $this->record->created_at->format('F j, Y \a\t g:i A')]);
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            Actions\Action::make('is_read')
-                ->label(__('Mark As Closed'))
-                ->icon('heroicon-o-check-circle')
-                ->color('success')
-                ->visible(fn($record) => $record->is_read == false)
-                ->action(function () {
-                    $this->record->update(['is_read' => true]);
-                    $this->record->save();
-                    \Filament\Notifications\Notification::make()
-                        ->title(__('Contact marked as closed'))
-                        ->success()
-                        ->send();
-                }),
-
-            Actions\DeleteAction::make()
-                ->requiresConfirmation()
-                ->modalHeading(__('Delete Contact Message'))
-                ->modalDescription(__('Are you sure you want to delete this contact message? This action cannot be undone.'))
-                ->modalSubmitActionLabel(__('Delete'))
-                ->modalCancelActionLabel(__('Cancel')),
-        ];
-    }
-
-    public function infolist(Infolist $infolist): Infolist
+    public function contactInfolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                // Contact Information Section
                 Section::make(__('Contact Information'))
                     ->description(__('Details about the person who contacted us'))
                     ->icon('heroicon-o-user')
@@ -79,7 +30,7 @@ class ViewContact extends ViewRecord
                                     ->iconPosition(IconPosition::Before)
                                     ->copyable()
                                     ->copyMessage(__('Name copied to clipboard')),
-                                
+
                                 TextEntry::make('email')
                                     ->label(__('Email'))
                                     ->color('info')
@@ -87,13 +38,12 @@ class ViewContact extends ViewRecord
                                     ->iconPosition(IconPosition::Before)
                                     ->copyable()
                                     ->copyMessage(__('Email copied to clipboard'))
-                                    ->url(fn($record) => 'mailto:' . $record->email)
+                                    ->url(fn ($record) => 'mailto:' . $record->email)
                                     ->openUrlInNewTab(),
                             ]),
                     ])
                     ->collapsible(),
 
-                // Message Content Section
                 Section::make(__('Message Content'))
                     ->description(__('The message content sent by the contact'))
                     ->icon('heroicon-o-chat-bubble-left-right')
@@ -114,9 +64,6 @@ class ViewContact extends ViewRecord
                     ])
                     ->collapsible(),
 
-                // Media Attachments Section (if any)
-              
-                // Metadata Section
                 Section::make(__('Message Metadata'))
                     ->description(__('Additional information about this contact message'))
                     ->icon('heroicon-o-information-circle')
@@ -129,14 +76,14 @@ class ViewContact extends ViewRecord
                                     ->color(fn ($state) => $state == 0 ? 'success' : 'danger')
                                     ->icon(fn ($state) => $state == 0 ? 'heroicon-o-light-bulb' : 'heroicon-o-exclamation-triangle')
                                     ->iconPosition(IconPosition::Before),
-                                
+
                                 TextEntry::make('created_at')
                                     ->label(__('Received At'))
                                     ->dateTime('F j, Y \a\t g:i A')
                                     ->icon('heroicon-o-clock')
                                     ->iconPosition(IconPosition::Before)
                                     ->color('gray'),
-                                
+
                                 TextEntry::make('updated_at')
                                     ->label(__('Last Updated'))
                                     ->dateTime('F j, Y \a\t g:i A')
@@ -149,4 +96,4 @@ class ViewContact extends ViewRecord
                     ->collapsed(),
             ]);
     }
-} 
+}

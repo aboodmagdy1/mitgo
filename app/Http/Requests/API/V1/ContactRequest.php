@@ -18,7 +18,8 @@ class ContactRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
             'message' => ['required', 'string', 'max:1000'],
-            'type' => ['required', 'integer', 'in:0,1'], // 0: comment, 1: provider
+            'type' => ['required', 'integer', 'in:0,1'], // 0: suggestions , 1: problem 
+            'source' => ['required', 'integer', 'in:0,1'], // 0: rider , 1: driver
         ];
     }
 }
