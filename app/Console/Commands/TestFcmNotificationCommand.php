@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Notifications\TestFcmNotification;
 use Illuminate\Console\Command;
 
-class TestFcmNotification extends Command
+class TestFcmNotificationCommand extends Command
 {
     protected $signature = 'fcm:test 
                             {user_id : The user ID to send test notification to}
