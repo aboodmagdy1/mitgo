@@ -16,9 +16,20 @@ use function App\Helpers\setting;
 
 class DriverSearchService
 {
-    private const INITIAL_RADIUS_KM = 2.0;// قطر الدايره إلي هبحث فيها أول مره
-    private const RADIUS_INCREMENT_KM = 1.0;// هزود القطر قد إي مع كل wave
-    private const DRIVERS_PER_WAVE = 5;// كام سواق في المره 
+    private function getInitialRadiusKm(): float
+    {
+        return (float) (setting('general', 'initial_radius_km') ?: 2.0);
+    }
+
+    private function getRadiusIncrementKm(): float
+    {
+        return (float) (setting('general', 'radius_increment_km') ?: 1.0);
+    }
+
+    private function getDriversPerWave(): int
+    {
+        return (int) (setting('general', 'drivers_per_wave') ?: 5);
+    }
 
     /**
      * Initiate the first wave of driver search for a trip
@@ -78,7 +89,7 @@ class DriverSearchService
         }
 
         // Get current radius
-        $currentRadius = (float) Redis::get("trip:{$trip->id}:current_radius") ?: self::INITIAL_RADIUS_KM;
+        $currentRadius = (float) Redis::get("trip:{$trip->id}:current_radius") ?: $this->getInitialRadiusKm();
 
         // Get already notified drivers
         $notifiedDriverIds = Redis::smembers("trip:{$trip->id}:notified_drivers") ?: [];
@@ -101,7 +112,7 @@ class DriverSearchService
         // Expand radius ONLY if there are zero available drivers in the current radius
         if (count($availableDrivers) === 0) {
             // Expand radius and search again
-            $expandedRadius = $currentRadius + self::RADIUS_INCREMENT_KM;
+            $expandedRadius = $currentRadius + $this->getRadiusIncrementKm();
             Log::info('Expanding search radius', [
                 'trip_id' => $trip->id,
                 'old_radius' => $currentRadius,
@@ -147,8 +158,8 @@ class DriverSearchService
             ];
         }
 
-        // Take up to DRIVERS_PER_WAVE drivers
-        $driversToNotify = array_slice($availableDrivers, 0, self::DRIVERS_PER_WAVE);
+        // Take up to drivers_per_wave drivers
+        $driversToNotify = array_slice($availableDrivers, 0, $this->getDriversPerWave());
 
         // Notify each driver
         $notifiedCount = $this->notifyDrivers($trip, $driversToNotify);
@@ -208,8 +219,8 @@ class DriverSearchService
             ];
         }
 
-        // Notify drivers (up to DRIVERS_PER_WAVE)
-        $driversToNotify = array_slice($availableDrivers, 0, self::DRIVERS_PER_WAVE);
+        // Notify drivers (up to drivers_per_wave)
+        $driversToNotify = array_slice($availableDrivers, 0, $this->getDriversPerWave());
         $notifiedCount = $this->notifyDrivers($trip, $driversToNotify);
 
         // Update Redis tracking
@@ -227,7 +238,7 @@ class DriverSearchService
      */
     private function calculateRadius(int $waveNumber): float
     {
-        return self::INITIAL_RADIUS_KM + (($waveNumber - 1) * self::RADIUS_INCREMENT_KM);
+        return $this->getInitialRadiusKm() + (($waveNumber - 1) * $this->getRadiusIncrementKm());
     }
 
     /**
@@ -356,13 +367,14 @@ class DriverSearchService
      */
     private function initializeSearchTracking(int $tripId): void
     {
+        $initialRadius = $this->getInitialRadiusKm();
         Redis::set("trip:{$tripId}:current_wave", 0);
-        Redis::set("trip:{$tripId}:current_radius", self::INITIAL_RADIUS_KM);
+        Redis::set("trip:{$tripId}:current_radius", $initialRadius);
         Redis::del("trip:{$tripId}:notified_drivers");
 
         Log::info('Initialized search tracking', [
             'trip_id' => $tripId,
-            'initial_radius' => self::INITIAL_RADIUS_KM
+            'initial_radius' => $initialRadius
         ]);
     }
 

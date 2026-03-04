@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
+use function App\Helpers\setting;
 
 class InitiateDriverSearch implements ShouldQueue
 {
@@ -47,14 +48,15 @@ class InitiateDriverSearch implements ShouldQueue
             }
 
             // Initialize Redis tracking
+            $initialRadius = (float) (setting('general', 'initial_radius_km') ?: 2.0);
             Redis::set("trip:{$tripId}:current_wave", 0);
-            Redis::set("trip:{$tripId}:current_radius", 2.0); // INITIAL_RADIUS_KM
+            Redis::set("trip:{$tripId}:current_radius", $initialRadius);
             Redis::del("trip:{$tripId}:notified_drivers");
             Redis::set($startedKey, 1);
 
             Log::info('Initialized search tracking', [
                 'trip_id' => $tripId,
-                'initial_radius' => 2.0
+                'initial_radius' => $initialRadius
             ]);
 
             // Dispatch automatic wave-based search job (starts from wave 1)
