@@ -1,4 +1,4 @@
-<div class="space-y-3">
+<div class="w-full space-y-3">
     @php
         $isRtl = app()->getLocale() === 'ar';
         $alignStart = $isRtl ? 'text-right' : 'text-left';
@@ -18,9 +18,8 @@
             <p class="mt-2">{{ __('wallet.no_withdraw_requests_found') }}</p>
         </div>
     @else
-        <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-800">
+    <div class="w-full overflow-x-auto rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
+        <table class="w-full min-w-full table-fixed divide-y divide-gray-200 dark:divide-gray-700">                <thead class="bg-gray-50 dark:bg-gray-800">
                     <tr>
                         <th class="px-4 py-3 {{ $alignEnd }} text-[11px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-300">
                             {{ __('wallet.amount') }}

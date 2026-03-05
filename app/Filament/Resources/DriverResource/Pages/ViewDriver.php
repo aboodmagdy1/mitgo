@@ -457,6 +457,27 @@ class ViewDriver extends ViewRecord
                                             }),
                                     ]),
                             ]),
+
+                        Tabs\Tab::make(__('Driver Trips'))
+                            ->icon('heroicon-o-map')
+                            ->schema([
+                                Section::make(__('Driver Trips'))
+                                    ->icon('heroicon-o-map')
+                                    ->columnSpanFull()
+                                    ->collapsible()
+                                    ->schema([
+                                        \Filament\Infolists\Components\ViewEntry::make('trips')
+                                            ->label('')
+                                            ->view('filament.infolists.components.driver-trips')
+                                            ->state(function ($record) {
+                                                return $record->trips()
+                                                    ->with(['payment', 'rate'])
+                                                    ->latest()
+                                                    ->limit(15)
+                                                    ->get();
+                                            }),
+                                    ]),
+                            ]),
                     ])
             ]);
     }
