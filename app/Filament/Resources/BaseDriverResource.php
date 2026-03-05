@@ -468,13 +468,13 @@ abstract class BaseDriverResource extends Resource
                                     ->schema([
                                         TextEntry::make('trips_count')
                                             ->label(__('Total Trips'))
-                                            ->formatStateUsing(fn ($record) => $record->trips()->count() ?? 0),
+                                            ->state(fn ($record) => $record->trips()->count()),
                                         TextEntry::make('ratings_count')
                                             ->label(__('Total Ratings'))
-                                            ->formatStateUsing(fn ($record) => $record->ratings()->count() ?? 0),
+                                            ->state(fn ($record) => $record->ratings()->count()),
                                         TextEntry::make('average_rating')
                                             ->label(__('Average Rating'))
-                                            ->formatStateUsing(function ($record) {
+                                            ->state(function ($record) {
                                                 $avg = $record->averageRating();
                                                 return $avg ? number_format($avg, 2) . ' ★' : __('No ratings yet');
                                             }),

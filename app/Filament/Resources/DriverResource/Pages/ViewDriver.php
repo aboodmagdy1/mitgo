@@ -362,17 +362,13 @@ class ViewDriver extends ViewRecord
                                     ->schema([
                                         TextEntry::make('trips_count')
                                             ->label(__('Total Trips'))
-                                            ->formatStateUsing(function ($record) {
-                                                return $record->trips()->count() ?? 0;
-                                            }),
+                                            ->state(fn ($record) => $record->trips()->count()),
                                         TextEntry::make('ratings_count')
                                             ->label(__('Total Ratings'))
-                                            ->formatStateUsing(function ($record) {
-                                                return $record->ratings()->count() ?? 0;
-                                            }),
+                                            ->state(fn ($record) => $record->ratings()->count()),
                                         TextEntry::make('average_rating')
                                             ->label(__('Average Rating'))
-                                            ->formatStateUsing(function ($record) {
+                                            ->state(function ($record) {
                                                 $avgRating = $record->averageRating();
                                                 return $avgRating ? number_format($avgRating, 2) . ' ★' : __('No ratings yet');
                                             }),
