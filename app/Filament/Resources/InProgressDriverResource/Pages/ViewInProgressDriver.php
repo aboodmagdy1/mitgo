@@ -56,9 +56,11 @@ class ViewInProgressDriver extends ViewRecord
                         ->body(__('Driver can now receive trip requests when active and online.'))
                         ->success()
                         ->send();
-                    $this->redirect(
-                        \App\Filament\Resources\MaleDriverResource::getUrl('view', ['record' => $record])
-                    );
+                    $resource = $record->user->gender === 'female'
+                        ? \App\Filament\Resources\FemaleDriverResource::class
+                        : \App\Filament\Resources\MaleDriverResource::class;
+
+                    $this->redirect($resource::getUrl('view', ['record' => $record]));
                 })
                 ->requiresConfirmation()
                 ->modalHeading(__('Approve Driver'))

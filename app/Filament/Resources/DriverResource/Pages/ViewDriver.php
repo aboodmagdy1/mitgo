@@ -25,15 +25,6 @@ class ViewDriver extends ViewRecord
 
     protected ?string $maxContentWidth = 'full';
 
-    public ?array $driverRequestRates = null;
-
-    public function loadDriverRequestRates(): void
-    {
-        if ($this->record) {
-            $this->driverRequestRates = app(TripRequestLogService::class)->getDriverRates($this->record->id);
-        }
-    }
-
     protected function getHeaderActions(): array
     {
         return [
@@ -375,7 +366,7 @@ class ViewDriver extends ViewRecord
                                         \Filament\Infolists\Components\ViewEntry::make('trip_request_rates')
                                             ->label(__('Trip Request Rates'))
                                             ->view('filament.infolists.components.driver-request-rates')
-                                            ->viewData(['driverRequestRates' => $this->driverRequestRates])
+                                            ->state(fn ($record) => app(TripRequestLogService::class)->getDriverRates($record->id))
                                             ->columnSpanFull(),
                                         TextEntry::make('user.created_at')
                                             ->label(__('Joined Date'))

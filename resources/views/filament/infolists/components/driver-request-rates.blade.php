@@ -1,9 +1,8 @@
-<div wire:init="loadDriverRequestRates" class="space-y-2">
-    @php $driverRequestRates = $driverRequestRates ?? (is_callable($getState ?? null) ? $getState() : null); @endphp
+<div class="space-y-2">
+    @php $driverRequestRates = is_callable($getState ?? null) ? $getState() : null; @endphp
     @if(($driverRequestRates ?? null) === null)
-        <div class="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-            <x-filament::loading-indicator class="h-5 w-5" />
-            <span class="text-sm">{{ __('Loading...') }}</span>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+            {{ __('No data available.') }}
         </div>
     @else
         @php

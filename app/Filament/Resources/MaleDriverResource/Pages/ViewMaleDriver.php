@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\MaleDriverResource\Pages;
 
 use App\Filament\Resources\MaleDriverResource;
-use App\Services\TripRequestLogService;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -15,15 +14,6 @@ class ViewMaleDriver extends ViewRecord
     protected static string $resource = MaleDriverResource::class;
 
     protected ?string $maxContentWidth = 'full';
-
-    public ?array $driverRequestRates = null;
-
-    public function loadDriverRequestRates(): void
-    {
-        if ($this->record) {
-            $this->driverRequestRates = app(TripRequestLogService::class)->getDriverRates($this->record->id);
-        }
-    }
 
     protected function getHeaderActions(): array
     {

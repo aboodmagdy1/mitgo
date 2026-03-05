@@ -72,6 +72,7 @@ class DriverService extends BaseService
             throw new \Exception(__('User must be authenticated to register as driver'));
         }
 
+        
         // Check if user already has a driver profile
         if ($user->driver) {
             throw new \Exception(__('User already has registered as driver'));
@@ -126,6 +127,8 @@ class DriverService extends BaseService
             $avatar = $data['avatar'];
             unset($data['avatar']);
         }
+        // is active should be setted to false 
+        $data['is_active'] = false;
         $updated = $this->update($user, $data);
         if($avatar){
             $user->clearMediaCollection('avatar');
@@ -188,11 +191,9 @@ class DriverService extends BaseService
     {
         $this->sendAdminNotification(__('New driver request'), __('A new driver request has been received'), 
         [Action::make('view')
-            ->url(route('filament.admin.resources.drivers.view', $user->driver->id))
+            ->url(route('filament.admin.resources.pending-drivers.index'))
             ->label(__('View'))
         ],'database');
-
-       
     }
 
 
