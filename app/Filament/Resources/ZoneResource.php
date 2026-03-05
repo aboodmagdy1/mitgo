@@ -109,6 +109,7 @@ class ZoneResource extends Resource
                     ->sortable(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()->label(__('View')),
                 Tables\Actions\EditAction::make()->label(__('Edit')),
                 Tables\Actions\DeleteAction::make()->label(__('Delete')),
             ])
@@ -124,6 +125,7 @@ class ZoneResource extends Resource
         return [
             'index' => Pages\ListZones::route('/'),
             'create' => Pages\CreateZone::route('/create'),
+            'view' => Pages\ViewZone::route('/{record}/view'),
             'edit' => Pages\EditZone::route('/{record}/edit'),
         ];
     }

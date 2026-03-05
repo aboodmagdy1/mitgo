@@ -424,5 +424,15 @@
     "notifications.trip_status": "Trip update: :status",
     "notifications.new_chat_message": "New message from :sender",
     "notifications.new_trip_request": "New trip request",
-    "Searching": "Searching"
+    "Searching": "Searching",
+    "No polygon data available": "No polygon data available",
+    "Total Trips Assigned": "Total Trips Assigned",
+    "Complete": "Complete",
+    "Acceptance": "Acceptance",
+    "Rejection": "Rejection",
+    "Cancellation": "Cancellation",
+    "No trips assigned to this zone yet.": "No trips assigned to this zone yet.",
+    "Of :total requests sent": "Of :total requests sent",
+    "All Time": "All Time",
+    "Showing trips from :from to :to": "Showing trips from :from to :to"
 }

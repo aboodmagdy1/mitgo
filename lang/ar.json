@@ -1846,5 +1846,19 @@
     "Language": "اللغة",
     "notifications.trip_status": "تحديث الرحلة: :status",
     "notifications.new_chat_message": "رسالة جديدة من :sender",
-    "notifications.new_trip_request": "طلب رحلة جديد"
+    "notifications.new_trip_request": "طلب رحلة جديد",
+    "No polygon data available": "لا توجد بيانات مضلع متاحة",
+    "Total Trips Assigned": "إجمالي الرحلات المعينة",
+    "Complete": "مكتمل",
+    "Acceptance": "القبول",
+    "Rejection": "الرفض",
+    "Cancellation": "الإلغاء",
+    "No trips assigned to this zone yet.": "لم يتم تعيين رحلات لهذه المنطقة بعد.",
+    "Of :total requests sent": "من :total طلب مرسل",
+    "All Time": "كل الوقت",
+    "Filter by Date": "تصفية بواسطة التاريخ",
+    "All time": "كل الوقت",
+    "Loading...": "جاري التحميل...",
+    "Zone Polygon": "مضلع المنطقة",
+    "Showing trips from :from to :to": "عرض الرحلات من :from إلى :to"
 }   
