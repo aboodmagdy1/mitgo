@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ApprovalStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -13,7 +14,7 @@ class Driver extends Model
     protected $fillable = [
         'user_id',
         'status',
-        'is_approved',
+        'approval_status',
         'date_of_birth',
         'national_id',
         'license_number',
@@ -21,81 +22,76 @@ class Driver extends Model
     ];
 
     protected $casts = [
-        'is_approved' => 'boolean',
-        'date_of_birth' => 'date',
-        'status' => 'integer',
+        'approval_status' => ApprovalStatus::class,
+        'date_of_birth'   => 'date',
+        'status'          => 'integer',
     ];
 
-    /**
-     * Get the user that owns the driver profile.
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the vehicle for the driver.
-     */
     public function vehicle(): HasOne
     {
         return $this->hasOne(DriverVehicle::class);
     }
 
-    /**
-     * Get all trips for the driver.
-     */
     public function trips(): HasMany
     {
         return $this->hasMany(Trip::class);
     }
 
-    /**
-     * Get all ratings for the driver.
-     */
     public function ratings(): HasMany
     {
         return $this->hasMany(TripRating::class);
     }
 
-    /**
-     * Get average rating for the driver.
-     */
     public function averageRating()
     {
         return $this->ratings()->avg('rating');
     }
 
-    /**
-     * Check if driver is online.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Status helpers
+    |--------------------------------------------------------------------------
+    */
+
     public function isOnline(): bool
     {
         return $this->status === 1;
     }
 
-    /**
-     * Check if driver is offline.
-     */
     public function isOffline(): bool
     {
         return $this->status === 0;
     }
 
-    /**
-     * Check if driver is approved.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Approval helpers
+    |--------------------------------------------------------------------------
+    */
+
     public function isApproved(): bool
     {
-        return $this->is_approved === true;
+        return $this->approval_status === ApprovalStatus::APPROVED;
     }
 
-    /**
-     * Check if driver is pending approval.
-     */
     public function isPendingApproval(): bool
     {
-        return $this->is_approved === false;
+        return $this->approval_status === ApprovalStatus::PENDING;
+    }
+
+    public function isInProgress(): bool
+    {
+        return $this->approval_status === ApprovalStatus::IN_PROGRESS;
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->approval_status === ApprovalStatus::REJECTED;
     }
 
     /**
@@ -104,10 +100,40 @@ class Driver extends Model
     public function approve(): bool
     {
         if ($this->isApproved()) {
-            return false; // Already approved, cannot approve again
+            return false;
         }
-        
-        return $this->update(['is_approved' => true]);
+
+        return $this->update([
+            'approval_status' => ApprovalStatus::APPROVED,
+        ]);
+    }
+
+    /**
+     * Move driver to in-progress inspection stage.
+     */
+    public function moveToInProgress(): bool
+    {
+        if (! $this->isPendingApproval()) {
+            return false;
+        }
+
+        return $this->update([
+            'approval_status' => ApprovalStatus::IN_PROGRESS,
+        ]);
+    }
+
+    /**
+     * Reject the driver application.
+     */
+    public function reject(): bool
+    {
+        if ($this->isApproved()) {
+            return false;
+        }
+
+        return $this->update([
+            'approval_status' => ApprovalStatus::REJECTED,
+        ]);
     }
 
     /**
@@ -116,92 +142,86 @@ class Driver extends Model
      */
     public function canReceiveTrips(): bool
     {
-        return $this->isApproved() && 
-               $this->user->is_active && 
+        return $this->isApproved() &&
+               $this->user->is_active &&
                $this->isOnline();
     }
 
-    /**
-     * Get all withdraw requests for the driver.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Wallet helpers
+    |--------------------------------------------------------------------------
+    */
+
     public function withdrawRequests(): HasMany
     {
         return $this->hasMany(DriverWithdrawRequest::class);
     }
 
-    /**
-     * Get pending withdraw requests for the driver.
-     */
     public function pendingWithdrawRequests(): HasMany
     {
         return $this->hasMany(DriverWithdrawRequest::class)->where('is_approved', false);
     }
 
-    /**
-     * Get approved withdraw requests for the driver.
-     */
     public function approvedWithdrawRequests(): HasMany
     {
         return $this->hasMany(DriverWithdrawRequest::class)->where('is_approved', true);
     }
 
-    /**
-     * Get the wallet balance through user relationship.
-     */
     public function getWalletBalance(): float
     {
         return $this->user->balance / 100 ?? 0;
     }
 
-    /**
-     * Get the wallet balance formatted.
-     */
     public function getFormattedBalanceAttribute(): string
     {
         return $this->getWalletBalance() . ' ' . config('app.currency', 'SAR');
     }
 
-    /**
-     * Deposit money to driver's wallet.
-     */
     public function deposit(float $amount, array $meta = []): \Bavix\Wallet\Models\Transaction
     {
         return $this->user->deposit($amount, $meta);
     }
 
-    /**
-     * Withdraw money from driver's wallet.
-     */
     public function withdraw(float $amount, array $meta = []): \Bavix\Wallet\Models\Transaction
     {
         return $this->user->withdraw($amount, $meta);
     }
 
-    /**
-     * Check if driver has sufficient balance.
-     */
     public function canWithdraw(float $amount): bool
     {
         return $this->user->canWithdraw($amount);
     }
 
-    /**
-     * Get all wallet transactions for this driver.
-     */
     public function getWalletTransactions()
     {
         return $this->user->transactions();
     }
 
     /*
-     |--------------------------------------------------------------------------
-     | Query Scopes (for driver search)
-     |--------------------------------------------------------------------------
-     */
+    |--------------------------------------------------------------------------
+    | Query Scopes
+    |--------------------------------------------------------------------------
+    */
 
     public function scopeApproved($query)
     {
-        return $query->where('is_approved', true);
+        return $query->where('approval_status', ApprovalStatus::APPROVED->value);
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('approval_status', ApprovalStatus::PENDING->value);
+    }
+
+    public function scopeInProgress($query)
+    {
+        return $query->where('approval_status', ApprovalStatus::IN_PROGRESS->value);
+    }
+
+    public function scopeRejected($query)
+    {
+        return $query->where('approval_status', ApprovalStatus::REJECTED->value);
     }
 
     public function scopeOnline($query)
@@ -211,7 +231,6 @@ class Driver extends Model
 
     public function scopeUserActive($query)
     {
-        // Ensure related user is active
         return $query->whereHas('user', function ($q) {
             $q->where('is_active', true);
         });
@@ -219,7 +238,6 @@ class Driver extends Model
 
     public function scopeWithUserLocation($query)
     {
-        // Join users to get latest lat/long for distance filtering
         return $query->join('users', 'drivers.user_id', '=', 'users.id')
             ->whereNotNull('users.latest_lat')
             ->whereNotNull('users.latest_long')
@@ -229,7 +247,7 @@ class Driver extends Model
     public function scopeHasVehicleType($query, int $vehicleTypeId)
     {
         return $query->whereHas('vehicle', function ($q) use ($vehicleTypeId) {
-            $q->whereIn('vehicle_type_id', [$vehicleTypeId,1]);
+            $q->whereIn('vehicle_type_id', [$vehicleTypeId, 1]);
         });
     }
 
@@ -246,22 +264,15 @@ class Driver extends Model
 
     public function scopeWithinBoundingBox($query, float $lat, float $lng, float $radiusKm)
     {
-        // Quick pre-filter using a bounding box to reduce rows before Haversine
-        $latDelta = $radiusKm / 111.045; // ~111.045 km per degree latitude
+        $latDelta = $radiusKm / 111.045;
         $lngDelta = $radiusKm / (111.045 * max(cos(deg2rad(max(min($lat, 89.9999), -89.9999))), 0.00001));
 
-        $minLat = $lat - $latDelta;
-        $maxLat = $lat + $latDelta;
-        $minLng = $lng - $lngDelta;
-        $maxLng = $lng + $lngDelta;
-
-        return $query->whereBetween('users.latest_lat', [$minLat, $maxLat])
-            ->whereBetween('users.latest_long', [$minLng, $maxLng]);
+        return $query->whereBetween('users.latest_lat', [$lat - $latDelta, $lat + $latDelta])
+            ->whereBetween('users.latest_long', [$lng - $lngDelta, $lng + $lngDelta]);
     }
 
     public function scopeWithinDistance($query, float $lat, float $lng, float $radiusKm)
     {
-        // Accurate filter using Haversine formula (Earth radius ~6371 km)
         $haversine = "(6371 * acos(cos(radians(?)) * cos(radians(users.latest_lat)) * cos(radians(users.latest_long) - radians(?)) + sin(radians(?)) * sin(radians(users.latest_lat))))";
 
         return $query->selectRaw(

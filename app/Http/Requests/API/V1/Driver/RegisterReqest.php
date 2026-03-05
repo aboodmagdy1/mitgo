@@ -36,6 +36,7 @@ class RegisterReqest extends FormRequest
             'plate_number' => 'required|string|max:255',
             'car_license_number' => 'required|string|max:255',
             'brand_model_id' => 'required|integer|exists:vehicle_brand_models,id',
+            'gender' => 'required|in:male,female',
         ];
     }
 

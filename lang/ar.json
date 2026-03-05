@@ -1860,5 +1860,22 @@
     "All time": "كل الوقت",
     "Loading...": "جاري التحميل...",
     "Zone Polygon": "مضلع المنطقة",
-    "Showing trips from :from to :to": "عرض الرحلات من :from إلى :to"
+    "Showing trips from :from to :to": "عرض الرحلات من :from إلى :to",
+
+    "Your registration request is still under review. Please wait for admin approval.": "طلبك قيد المراجعة، يرجى الانتظار حتى يتم قبولك.",
+    "Your request is currently being inspected. You will be notified once the review is complete.": "طلبك في مرحلة المعاينة، سيتم إخطارك بالنتيجة قريباً.",
+    "Your registration request has been rejected. Please contact support for more information.": "تم رفض طلب تسجيلك. يرجى التواصل مع الدعم لمزيد من المعلومات.",
+    "Your account is not yet approved.": "حسابك لم تتم الموافقة عليه بعد.",
+
+    "Pending": "قيد الانتظار",
+    "In Progress": "قيد المعاينة",
+    "Approved": "موافق عليه",
+    "Rejected": "مرفوض",
+
+    "Move to Inspection": "نقل للمعاينة",
+    "Move to Inspection Stage": "نقل إلى مرحلة المعاينة",
+    "Are you sure you want to move this driver to the inspection stage?": "هل أنت متأكد أنك تريد نقل هذا السائق إلى مرحلة المعاينة؟",
+    "Driver moved to inspection stage.": "تم نقل السائق إلى مرحلة المعاينة.",
+    "Driver application rejected.": "تم رفض طلب السائق.",
+    "Are you sure you want to reject this driver application? The driver will be notified.": "هل أنت متأكد أنك تريد رفض طلب هذا السائق؟"
 }   

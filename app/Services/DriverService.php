@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ApprovalStatus;
 use App\Enums\TripStatus;
 use App\Enums\Users\ProfileStatus;
 use App\Enums\Users\UserTypeEnum;
@@ -82,7 +83,7 @@ class DriverService extends BaseService
         // Create driver profile
         $data['user_id'] = $user->id;
         $data['status'] = 0;
-        $data['is_approved'] = false;
+        $data['approval_status'] = ApprovalStatus::PENDING->value;
         $driver = Driver::create($data);
 
         // Assign driver role

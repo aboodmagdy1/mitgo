@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Enums\ApprovalStatus;
 use App\Http\Resources\API\V1\UserResource;
 use App\Http\Resources\API\V1\Driver\DriverProfileResource;
 use App\Http\Traits\ApiResponseTrait;
@@ -45,9 +46,13 @@ class AuthService extends BaseService
             }
 
             // Step 2: Check driver-specific approval status (only for drivers)
-            // Case 3: Driver trying to login but driver account is not approved
-            if ($isDriver && $userIsDriver && $user->driver && !$user->driver->isApproved()) {
-                return $this->errorResponse(__('Your registration request is still under review. Please wait for admin approval.'), 403);
+            if ($isDriver && $userIsDriver && $user->driver && ! $user->driver->isApproved()) {
+                return match ($user->driver->approval_status) {
+                    ApprovalStatus::PENDING     => $this->errorResponse(__('Your registration request is still under review. Please wait for admin approval.'), 403),
+                    ApprovalStatus::IN_PROGRESS => $this->errorResponse(__('Your request is currently being inspected. You will be notified once the review is complete.'), 403),
+                    ApprovalStatus::REJECTED    => $this->errorResponse(__('Your registration request has been rejected. Please contact support for more information.'), 403),
+                    default                     => $this->errorResponse(__('Your account is not yet approved.'), 403),
+                };
             }
             
             // Step 3: Check account deactivation (applies to both riders and drivers)

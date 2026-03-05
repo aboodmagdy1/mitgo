@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DriverResource\Pages;
 
+use App\Enums\ApprovalStatus;
 use App\Filament\Resources\DriverResource;
 use App\Models\DriverWithdrawRequest;
 use App\Models\VehicleType;
@@ -12,6 +13,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\SpatieMediaLibraryImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Tabs;
 use Filament\Support\Enums\FontWeight;
@@ -42,7 +44,7 @@ class ViewDriver extends ViewRecord
                 ->label(__('Approve Driver'))
                 ->icon('heroicon-o-check-badge')
                 ->color('success')
-                ->visible(fn ($record) => !$record->is_approved)
+                ->visible(fn ($record) => ! $record->isApproved())
                 ->form([
                     Forms\Components\Select::make('vehicle_type_id')
                         ->label(__('Vehicle Type'))
@@ -266,6 +268,11 @@ class ViewDriver extends ViewRecord
                                 Section::make(__('Personal Information'))
                                     ->icon('heroicon-o-user')
                                     ->schema([
+                                        // driver have avatar using user->getFirstMediaUrl("avatar")
+                                        SpatieMediaLibraryImageEntry::make('user.avatar')
+                                            ->label(__('Avatar'))
+                                            ->collection('avatar')
+                                            ->columnSpan(2),
                                         TextEntry::make('user.name')
                                             ->label(__('Name'))
                                             ->icon('heroicon-o-user'),
@@ -302,11 +309,11 @@ class ViewDriver extends ViewRecord
                                         TextEntry::make('absher_phone')
                                             ->label(__('Absher Phone'))
                                             ->copyable(),
-                                        TextEntry::make('is_approved')
+                                        TextEntry::make('approval_status')
                                             ->label(__('Approval Status'))
                                             ->badge()
-                                            ->formatStateUsing(fn (?bool $state): string => $state ? __('Approved') : __('Pending Approval'))
-                                            ->color(fn (?bool $state): string => $state ? 'success' : 'warning'),
+                                            ->formatStateUsing(fn ($state): string => \App\Filament\Resources\BaseDriverResource::normalizeApprovalStatus($state)->label())
+                                            ->color(fn ($state): string => \App\Filament\Resources\BaseDriverResource::normalizeApprovalStatus($state)->color()),
                                         TextEntry::make('status')
                                             ->label(__('Driver Status'))
                                             ->badge()
@@ -471,7 +478,7 @@ class ViewDriver extends ViewRecord
                                             ->view('filament.infolists.components.driver-trips')
                                             ->state(function ($record) {
                                                 return $record->trips()
-                                                    ->with(['payment', 'rate'])
+                                                    ->with(['payment', 'rate.ratingComment'])
                                                     ->latest()
                                                     ->limit(15)
                                                     ->get();

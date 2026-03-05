@@ -434,5 +434,16 @@
     "No trips assigned to this zone yet.": "No trips assigned to this zone yet.",
     "Of :total requests sent": "Of :total requests sent",
     "All Time": "All Time",
-    "Showing trips from :from to :to": "Showing trips from :from to :to"
+    "Showing trips from :from to :to": "Showing trips from :from to :to",
+
+    "Your registration request is still under review. Please wait for admin approval.": "Your registration request is still under review. Please wait for admin approval.",
+    "Your request is currently being inspected. You will be notified once the review is complete.": "Your request is currently being inspected. You will be notified once the review is complete.",
+    "Your registration request has been rejected. Please contact support for more information.": "Your registration request has been rejected. Please contact support for more information.",
+    "Your account is not yet approved.": "Your account is not yet approved.",
+
+    "Move to Inspection": "Move to Inspection",
+    "Are you sure you want to move this driver to the inspection stage?": "Are you sure you want to move this driver to the inspection stage?",
+    "Driver moved to inspection stage.": "Driver moved to inspection stage.",
+    "Driver application rejected.": "Driver application rejected.",
+    "Are you sure you want to reject this driver application? The driver will be notified.": "Are you sure you want to reject this driver application? The driver will be notified."
 }

@@ -33,6 +33,9 @@
                         <th class="px-4 py-3 {{ $alignEnd }} text-[11px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-300">
                             {{ __('Rating') }}
                         </th>
+                        <th class="px-4 py-3 {{ $alignStart }} text-[11px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-300">
+                            {{ __('Comment') }}
+                        </th>
                         <th class="px-4 py-3 {{ $alignEnd }} text-[11px] font-medium uppercase tracking-wider text-gray-600 dark:text-gray-300">
                             {{ __('Date') }}
                         </th>
@@ -79,6 +82,15 @@
                                 @if($trip->rate)
                                     <span class="inline-flex items-center gap-0.5 font-medium">
                                         {{ $trip->rate->rating }} ★
+                                    </span>
+                                @else
+                                    <span class="text-gray-400 dark:text-gray-500">—</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 {{ $alignStart }} text-gray-700 dark:text-gray-300 max-w-[200px]">
+                                @if($trip->rate?->ratingComment)
+                                    <span class="line-clamp-2" title="{{ $trip->rate->ratingComment->comment }}">
+                                        {{ $trip->rate->ratingComment->comment }}
                                     </span>
                                 @else
                                     <span class="text-gray-400 dark:text-gray-500">—</span>
