@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\User;
+use App\Services\TripRequestLogService;
 use App\Support\DashboardDateFilter;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -140,6 +141,8 @@ class AdvancedDashboardStatsWidget extends BaseWidget
 
         $row = DB::selectOne($sql, $bindingsOrdered);
 
+        $tripRequestRates = app(TripRequestLogService::class)->getAggregateRates();
+
         return [
             'total_trips' => (int) ($row->total_trips ?? 0),
             'active_trips' => (int) ($row->active_trips ?? 0),
@@ -149,6 +152,12 @@ class AdvancedDashboardStatsWidget extends BaseWidget
             'total_drivers' => (int) ($row->total_drivers ?? 0),
             'total_clients' => (int) ($row->total_clients ?? 0),
             'active_clients' => (int) ($row->active_clients ?? 0),
+            'trip_request_total' => $tripRequestRates['total'],
+            'trip_request_accepted' => $tripRequestRates['accepted'],
+            'trip_request_rejected' => $tripRequestRates['rejected'],
+            'trip_request_responded' => $tripRequestRates['responded'],
+            'trip_request_acceptance_rate' => $tripRequestRates['acceptance_rate'],
+            'trip_request_rejection_rate' => $tripRequestRates['rejection_rate'],
         ];
     }
 
@@ -183,6 +192,34 @@ class AdvancedDashboardStatsWidget extends BaseWidget
                 ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.cancelled_in_period') : __('stats.all_time'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
+            Stat::make(__('stats.driver_acceptance_rate'), $this->formatTripRequestStats($data, 'acceptance'))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.trip_requests_in_period') : __('stats.all_time'))
+                ->descriptionIcon('heroicon-m-check-circle')
+                ->color('success'),
+            Stat::make(__('stats.driver_rejection_rate'), $this->formatTripRequestStats($data, 'rejection'))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.trip_requests_in_period') : __('stats.all_time'))
+                ->descriptionIcon('heroicon-m-x-circle')
+                ->color('danger'),
         ];
+    }
+
+    private function formatTripRequestStats(array $data, string $type): string
+    {
+        $total = $data['trip_request_total'] ?? 0;
+        if ($total === 0) {
+            return __('stats.zero_requests');
+        }
+
+        $responded = $data['trip_request_responded'] ?? 0;
+        if ($responded === 0) {
+            return __('stats.zero_requests');
+        }
+
+        $accepted = $data['trip_request_accepted'] ?? 0;
+        $rejected = $data['trip_request_rejected'] ?? 0;
+
+        return $type === 'acceptance'
+            ? "{$accepted}/{$responded} (" . ($data['trip_request_acceptance_rate'] ?? 0) . "%)"
+            : "{$rejected}/{$responded} (" . ($data['trip_request_rejection_rate'] ?? 0) . "%)";
     }
 }

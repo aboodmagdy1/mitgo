@@ -22,7 +22,9 @@ use App\Events\TripStarted;
 use App\Events\TripEnded;
 use App\Events\TripCompleted;
 use App\Events\TripNoShow;
+use App\Enums\TripRequestOutcome;
 use App\Events\TripRequestExpired;
+use App\Models\TripRequestLog;
 use App\Events\TripCancelled as TripCancelledEvent;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -963,6 +965,12 @@ class TripService extends BaseService
                 'driver_id' => $driverId,
                 'status' => TripStatus::IN_ROUTE_TO_PICKUP,
             ]);
+
+            // Log acceptance for rate reports (updateOrCreate handles race if listener not run yet)
+            TripRequestLog::updateOrCreate(
+                ['trip_id' => $trip->id, 'driver_id' => $driverId],
+                ['outcome' => TripRequestOutcome::ACCEPTED, 'resolved_at' => now(), 'sent_at' => now()]
+            );
             
             // Reload relationships for response
             $trip->load(['driver.user', 'driver.vehicle', 'user', 'vehicleType', 'paymentMethod']);
@@ -1062,6 +1070,12 @@ class TripService extends BaseService
             'trip_id' => $tripId,
             'driver_id' => $driverId
         ]);
+
+        // Log rejection for rate reports (updateOrCreate handles race if listener not run yet)
+        TripRequestLog::updateOrCreate(
+            ['trip_id' => $tripId, 'driver_id' => $driverId],
+            ['outcome' => TripRequestOutcome::REJECTED, 'resolved_at' => now(), 'sent_at' => now()]
+        );
         
         // Clear driver's active request (allows them to receive new requests)
         $this->driverSearchService->clearActiveRequest($driverId);

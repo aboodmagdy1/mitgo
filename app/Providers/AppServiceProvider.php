@@ -22,6 +22,7 @@ use App\Events\TripRequestSent;
 use App\Events\TripStarted;
 use App\Listeners\InitiateDriverSearch;
 use App\Listeners\SendChatMessageFcmNotification;
+use App\Listeners\LogTripRequestToDb;
 use App\Listeners\SendNewTripRequestFcmNotification;
 use App\Listeners\SendTripStatusFcmNotification;
 use Modules\Chat\Events\MessageSent;
@@ -76,6 +77,9 @@ class AppServiceProvider extends ServiceProvider
 
         // FCM notifications for new trip request (to driver)
         Event::listen(TripRequestSent::class, SendNewTripRequestFcmNotification::class);
+
+        // Log trip request to DB for acceptance/rejection rate reports (async, non-blocking)
+        Event::listen(TripRequestSent::class, LogTripRequestToDb::class);
 
         // FCM notifications for new chat message
         Event::listen(MessageSent::class, SendChatMessageFcmNotification::class);

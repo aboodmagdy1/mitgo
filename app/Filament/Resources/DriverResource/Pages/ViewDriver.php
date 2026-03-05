@@ -5,6 +5,7 @@ namespace App\Filament\Resources\DriverResource\Pages;
 use App\Filament\Resources\DriverResource;
 use App\Models\DriverWithdrawRequest;
 use App\Models\VehicleType;
+use App\Services\TripRequestLogService;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -19,8 +20,17 @@ use Illuminate\Support\Facades\Auth;
 class ViewDriver extends ViewRecord
 {
     protected static string $resource = DriverResource::class;
-    
+
     protected ?string $maxContentWidth = 'full';
+
+    public ?array $driverRequestRates = null;
+
+    public function loadDriverRequestRates(): void
+    {
+        if ($this->record) {
+            $this->driverRequestRates = app(TripRequestLogService::class)->getDriverRates($this->record->id);
+        }
+    }
 
     protected function getHeaderActions(): array
     {
@@ -359,6 +369,11 @@ class ViewDriver extends ViewRecord
                                                 $avgRating = $record->averageRating();
                                                 return $avgRating ? number_format($avgRating, 2) . ' ★' : __('No ratings yet');
                                             }),
+                                        \Filament\Infolists\Components\ViewEntry::make('trip_request_rates')
+                                            ->label(__('Trip Request Rates'))
+                                            ->view('filament.infolists.components.driver-request-rates')
+                                            ->viewData(['driverRequestRates' => $this->driverRequestRates])
+                                            ->columnSpanFull(),
                                         TextEntry::make('user.created_at')
                                             ->label(__('Joined Date'))
                                             ->dateTime(),
