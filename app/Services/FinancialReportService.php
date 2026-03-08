@@ -40,12 +40,12 @@ class FinancialReportService
     {
         $completed = TripStatus::COMPLETED->value;
 
-        Log::debug('[FinancialReport] computeStatCards', [
-            'date_range' => $dateRange
-                ? [$dateRange[0]->toDateTimeString(), $dateRange[1]->toDateTimeString()]
-                : 'ALL',
-            'completed_status_value' => $completed,
-        ]);
+        // Log::debug('[FinancialReport] computeStatCards', [
+        //     'date_range' => $dateRange
+        //         ? [$dateRange[0]->toDateTimeString(), $dateRange[1]->toDateTimeString()]
+        //         : 'ALL',
+        //     'completed_status_value' => $completed,
+        // ]);
 
         // Revenue from completed trips joined with trip_payments (all payment statuses).
         // Primary filter is trips.status = COMPLETED, matching the dashboard approach.
@@ -103,20 +103,20 @@ class FinancialReportService
         // Wallet balances (all users — no date filter, this is a point-in-time balance).
         $walletBalance = DB::table('wallets')->sum('balance')/100;
 
-        Log::debug('[FinancialReport] completedRow raw', (array) $completedRow);
-        Log::debug('[FinancialReport] pendingRow raw',   (array) $pendingRow);
-        Log::debug('[FinancialReport] refundedRow raw',  (array) $refundedRow);
-        Log::debug('[FinancialReport] tripsRow raw',     (array) $tripsRow);
-        Log::debug('[FinancialReport] walletBalance raw', ['wallet_balance' => $walletBalance]);
+        // Log::debug('[FinancialReport] completedRow raw', (array) $completedRow);
+        // Log::debug('[FinancialReport] pendingRow raw',   (array) $pendingRow);
+        // Log::debug('[FinancialReport] refundedRow raw',  (array) $refundedRow);
+        // Log::debug('[FinancialReport] tripsRow raw',     (array) $tripsRow);
+        // Log::debug('[FinancialReport] walletBalance raw', ['wallet_balance' => $walletBalance]);
 
         // Sanity-check: total completed trips (no payment join) to compare
         $completedTripCount = DB::table('trips')->where('status', $completed)->count();
         $completedTripFare  = DB::table('trips')->where('status', $completed)->sum('actual_fare');
-        Log::debug('[FinancialReport] trips table sanity-check', [
-            'completed_trips_count'     => $completedTripCount,
-            'sum_actual_fare_from_trips' => $completedTripFare,
-            'trip_payments_joined_count' => $completedRow->completed_count ?? 0,
-        ]);
+        // Log::debug('[FinancialReport] trips table sanity-check', [
+        //     'completed_trips_count'     => $completedTripCount,
+        //     'sum_actual_fare_from_trips' => $completedTripFare,
+        //     'trip_payments_joined_count' => $completedRow->completed_count ?? 0,
+        // ]);
 
         $totalRevenue = (float) ($completedRow->total_revenue ?? 0);
 
@@ -168,10 +168,10 @@ class FinancialReportService
 
             $rows = $query->get();
 
-            Log::debug('[FinancialReport] getRevenueOverTime', [
-                'row_count' => $rows->count(),
-                'rows'      => $rows->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getRevenueOverTime', [
+            //     'row_count' => $rows->count(),
+            //     'rows'      => $rows->toArray(),
+            // ]);
 
             return [
                 'labels' => $rows->pluck('day')->map(fn ($d) => Carbon::parse($d)->format('M d'))->toArray(),
@@ -216,10 +216,10 @@ class FinancialReportService
                 return $name;
             })->toArray();
 
-            Log::debug('[FinancialReport] getPaymentMethodsDistribution', [
-                'row_count' => $rows->count(),
-                'rows'      => $rows->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getPaymentMethodsDistribution', [
+            //     'row_count' => $rows->count(),
+            //     'rows'      => $rows->toArray(),
+            // ]);
 
             return [
                 'labels'  => $labels,
@@ -257,10 +257,10 @@ class FinancialReportService
 
             $rows = $query->get();
 
-            Log::debug('[FinancialReport] getCommissionVsDriverEarnings', [
-                'row_count' => $rows->count(),
-                'rows'      => $rows->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getCommissionVsDriverEarnings', [
+            //     'row_count' => $rows->count(),
+            //     'rows'      => $rows->toArray(),
+            // ]);
 
             return [
                 'labels'          => $rows->pluck('month')->map(fn ($m) => Carbon::parse($m . '-01')->format('M Y'))->toArray(),
@@ -297,10 +297,10 @@ class FinancialReportService
 
             $rows = $query->get();
 
-            Log::debug('[FinancialReport] getTopEarningDrivers', [
-                'row_count' => $rows->count(),
-                'rows'      => $rows->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getTopEarningDrivers', [
+            //     'row_count' => $rows->count(),
+            //     'rows'      => $rows->toArray(),
+            // ]);
 
             return [
                 'labels' => $rows->pluck('name')->toArray(),
@@ -336,10 +336,10 @@ class FinancialReportService
 
             $rows = $query->get();
 
-            Log::debug('[FinancialReport] getCouponImpact', [
-                'row_count' => $rows->count(),
-                'rows'      => $rows->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getCouponImpact', [
+            //     'row_count' => $rows->count(),
+            //     'rows'      => $rows->toArray(),
+            // ]);
 
             return [
                 'labels'    => $rows->pluck('code')->toArray(),
@@ -377,10 +377,10 @@ class FinancialReportService
 
             $rows = $query->get();
 
-            Log::debug('[FinancialReport] getTripsVsRevenue', [
-                'row_count' => $rows->count(),
-                'rows'      => $rows->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getTripsVsRevenue', [
+            //     'row_count' => $rows->count(),
+            //     'rows'      => $rows->toArray(),
+            // ]);
 
             return [
                 'labels'  => $rows->pluck('day')->map(fn ($d) => Carbon::parse($d)->format('M d'))->toArray(),
@@ -428,10 +428,10 @@ class FinancialReportService
                 return $name;
             })->toArray();
 
-            Log::debug('[FinancialReport] getRevenueByZone', [
-                'row_count' => $rows->count(),
-                'rows'      => $rows->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getRevenueByZone', [
+            //     'row_count' => $rows->count(),
+            //     'rows'      => $rows->toArray(),
+            // ]);
 
             return [
                 'labels' => $labels,
@@ -475,11 +475,11 @@ class FinancialReportService
                 $data[]   = round((float) ($rows->get($h)?->revenue ?? 0), 2);
             }
 
-            Log::debug('[FinancialReport] getRevenueByHour', [
-                'non_zero_hours' => $rows->count(),
-                'raw_rows'       => $rows->toArray(),
-                'data_totals'    => array_sum($data),
-            ]);
+            // Log::debug('[FinancialReport] getRevenueByHour', [
+            //     'non_zero_hours' => $rows->count(),
+            //     'raw_rows'       => $rows->toArray(),
+            //     'data_totals'    => array_sum($data),
+            // ]);
 
             return ['labels' => $labels, 'data' => $data];
         });
@@ -523,10 +523,10 @@ class FinancialReportService
 
             $result = $query->get();
 
-            Log::debug('[FinancialReport] getDailySummary', [
-                'row_count'    => $result->count(),
-                'rows'         => $result->toArray(),
-            ]);
+            // Log::debug('[FinancialReport] getDailySummary', [
+            //     'row_count'    => $result->count(),
+            //     'rows'         => $result->toArray(),
+            // ]);
 
             return $result;
         });
