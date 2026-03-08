@@ -48,7 +48,6 @@ class CreateDriver extends CreateRecord
         $driver = $user->driver()->create([
             'date_of_birth' => $data['date_of_birth'],
             'national_id' => $data['national_id'],
-            'license_number' => $data['license_number'],
             'absher_phone' => $data['absher_phone'],
             'status' => $data['status'] ?? 0,
         ]);

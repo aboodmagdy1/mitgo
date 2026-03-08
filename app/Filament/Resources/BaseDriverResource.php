@@ -94,10 +94,6 @@ abstract class BaseDriverResource extends Resource
                         ->label(__('National ID'))
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('license_number')
-                        ->label(__('License Number'))
-                        ->required()
-                        ->maxLength(255),
                     Forms\Components\TextInput::make('absher_phone')
                         ->label(__('Absher Phone'))
                         ->tel()

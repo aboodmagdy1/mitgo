@@ -168,7 +168,7 @@ class AuthService extends BaseService
 
         // Prepare data for Driver model update
         $driverData = [];
-        $driverFields = ['absher_phone', 'national_id', 'license_number', 'date_of_birth'];
+        $driverFields = ['absher_phone', 'national_id', 'date_of_birth'];
         foreach ($driverFields as $field) {
             if (array_key_exists($field, $data)) {
                 $driverData[$field] = $data[$field];

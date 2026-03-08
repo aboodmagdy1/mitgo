@@ -28,7 +28,6 @@ class RegisterReqest extends FormRequest
             'name' => 'required|string|max:255',
             'absher_phone' => 'required|string|max:255',
             'national_id' => 'required|string|max:255',
-            'license_number' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
             'city_id' => 'required|integer|exists:cities,id',
             'seats' => 'required|string',

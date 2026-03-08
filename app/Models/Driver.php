@@ -17,7 +17,6 @@ class Driver extends Model
         'approval_status',
         'date_of_birth',
         'national_id',
-        'license_number',
         'absher_phone',
     ];
 

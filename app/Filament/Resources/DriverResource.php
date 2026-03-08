@@ -62,8 +62,6 @@ class DriverResource extends Resource
                         ->label(__('Date of Birth'))->required(),
                     Forms\Components\TextInput::make('national_id')
                         ->label(__('National ID'))->required()->maxLength(255),
-                    Forms\Components\TextInput::make('license_number')
-                        ->label(__('License Number'))->required()->maxLength(255),
                     Forms\Components\TextInput::make('absher_phone')
                         ->label(__('Absher Phone'))->tel()->required()->maxLength(255),
                     Forms\Components\Select::make('status')

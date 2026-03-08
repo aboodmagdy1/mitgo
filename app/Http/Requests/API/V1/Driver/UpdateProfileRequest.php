@@ -32,7 +32,6 @@ class UpdateProfileRequest extends FormRequest
             'phone' => 'nullable|string|max:255|unique:users,phone,' . $user->id,
             'absher_phone' => $driverId ? 'nullable|string|max:255|unique:drivers,absher_phone,' . $driverId : 'nullable|string|max:255',
             'national_id' => $driverId ? 'nullable|string|max:255|unique:drivers,national_id,' . $driverId : 'nullable|string|max:255',
-            'license_number' => $driverId ? 'nullable|string|max:255|unique:drivers,license_number,' . $driverId : 'nullable|string|max:255',
             'date_of_birth' => 'nullable|date',
             'city_id' => 'nullable|integer|exists:cities,id',
             'seats' => 'nullable|integer|min:1',
