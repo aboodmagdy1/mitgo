@@ -99,7 +99,6 @@ class DriverResource extends Resource
                                 ->where('active', true)->pluck('name', 'id');
                         })->required()->reactive()->searchable(),
                     Forms\Components\TextInput::make('vehicle.color')->label(__('Vehicle Color'))->maxLength(255),
-                    Forms\Components\TextInput::make('vehicle.license_number')->label(__('Vehicle License Number'))->maxLength(255),
                     Forms\Components\TextInput::make('vehicle.plate_number')->label(__('Plate Number'))->maxLength(255),
                     Forms\Components\TextInput::make('vehicle.seats')->label(__('Number of Seats'))->numeric()->minValue(1)->maxValue(50),
                 ])->columns(2),

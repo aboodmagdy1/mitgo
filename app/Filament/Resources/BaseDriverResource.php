@@ -405,9 +405,6 @@ abstract class BaseDriverResource extends Resource
                                         TextEntry::make('national_id')
                                             ->label(__('National ID'))
                                             ->copyable(),
-                                        TextEntry::make('license_number')
-                                            ->label(__('License Number'))
-                                            ->copyable(),
                                         TextEntry::make('absher_phone')
                                             ->label(__('Absher Phone'))
                                             ->copyable(),
