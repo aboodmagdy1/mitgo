@@ -77,7 +77,10 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Drop Lists')
                     ->collapsed(),
-              
+                NavigationGroup::make()
+                    ->label('Finance')
+                    ->icon('heroicon-o-banknotes')
+                    ->collapsed(),
                 NavigationGroup::make()
                     ->label('Users')
                     ->collapsed(),

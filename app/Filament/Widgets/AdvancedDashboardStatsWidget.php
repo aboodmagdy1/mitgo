@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\User;
+use App\Services\FinancialReportService;
 use App\Services\TripRequestLogService;
 use App\Support\DashboardDateFilter;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -143,6 +144,9 @@ class AdvancedDashboardStatsWidget extends BaseWidget
 
         $tripRequestRates = app(TripRequestLogService::class)->getAggregateRates();
 
+        // Financial stats (revenue, profit, driver earnings, pending payments)
+        $financial = app(FinancialReportService::class)->getStatCards($range);
+
         return [
             'total_trips' => (int) ($row->total_trips ?? 0),
             'active_trips' => (int) ($row->active_trips ?? 0),
@@ -152,6 +156,11 @@ class AdvancedDashboardStatsWidget extends BaseWidget
             'total_drivers' => (int) ($row->total_drivers ?? 0),
             'total_clients' => (int) ($row->total_clients ?? 0),
             'active_clients' => (int) ($row->active_clients ?? 0),
+            'total_revenue' => (float) ($financial['total_revenue'] ?? 0),
+            'company_profit' => (float) ($financial['company_profit'] ?? 0),
+            'driver_earnings' => (float) ($financial['driver_earnings'] ?? 0),
+            'pending_amount' => (float) ($financial['pending_amount'] ?? 0),
+            'pending_count' => (int) ($financial['pending_count'] ?? 0),
             'trip_request_total' => $tripRequestRates['total'],
             'trip_request_accepted' => $tripRequestRates['accepted'],
             'trip_request_rejected' => $tripRequestRates['rejected'],
@@ -200,6 +209,22 @@ class AdvancedDashboardStatsWidget extends BaseWidget
                 ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.trip_requests_in_period') : __('stats.all_time'))
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
+            Stat::make(__('stats.total_revenue'), number_format($data['total_revenue'] ?? 0, 2))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.revenue_in_period_label') : __('stats.revenue_all_time_label'))
+                ->descriptionIcon('heroicon-m-currency-dollar')
+                ->color('primary'),
+            Stat::make(__('stats.revenue_company_profit'), number_format($data['company_profit'] ?? 0, 2))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.profit_in_period') : __('stats.profit_all_time'))
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('success'),
+            Stat::make(__('stats.driver_earnings'), number_format($data['driver_earnings'] ?? 0, 2))
+                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.earnings_in_period') : __('stats.earnings_all_time'))
+                ->descriptionIcon('heroicon-m-user-group')
+                ->color('success'),
+            Stat::make(__('stats.pending_payments'), number_format($data['pending_amount'] ?? 0, 2))
+                ->description(__('stats.pending_count_label', ['count' => number_format($data['pending_count'] ?? 0)]))
+                ->descriptionIcon('heroicon-m-clock')
+                ->color('warning'),
         ];
     }
 

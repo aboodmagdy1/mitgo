@@ -30,8 +30,7 @@ class DatabaseSeeder extends Seeder
             ZoneSeeder::class,
             ZoneVehicleTypePricingSeeder::class,
             ZonePricingModifierSeeder::class,
+            DemoTripsSeeder::class,
         ]);
-
-
     }
 }

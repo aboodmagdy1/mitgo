@@ -2,7 +2,9 @@
     use App\Support\DashboardDateFilter;
     $currency = __('SAR');
     $formatAmount = fn($amount) => number_format($amount, 2);
-    $periodLabel = DashboardDateFilter::hasActiveFilter() ? __('stats.revenue_in_period', ['amount' => $formatAmount($totalRevenue)]) : __('stats.revenue_all_time', ['amount' => $formatAmount($totalRevenue)]);
+    $periodLabel = DashboardDateFilter::hasActiveFilter()
+        ? __('stats.revenue_in_period', ['amount' => $formatAmount($totalRevenue)])
+        : __('stats.revenue_all_time', ['amount' => $formatAmount($totalRevenue)]);
     $items = [
         ['label' => __('stats.revenue_company_profit'), 'value' => $companyProfit, 'icon' => 'heroicon-m-building-office-2', 'iconBg' => 'bg-primary-100 dark:bg-primary-900/30', 'iconColor' => 'text-primary-600 dark:text-primary-400'],
         ['label' => __('stats.revenue_tax'), 'value' => $tax, 'icon' => 'heroicon-m-calculator', 'iconBg' => 'bg-amber-100 dark:bg-amber-900/30', 'iconColor' => 'text-amber-600 dark:text-amber-400'],

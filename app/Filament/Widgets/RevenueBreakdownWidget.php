@@ -2,11 +2,9 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Trip;
-use App\Settings\GeneralSettings;
+use App\Services\FinancialReportService;
 use App\Support\DashboardDateFilter;
 use Filament\Widgets\Widget;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 
 class RevenueBreakdownWidget extends Widget
@@ -21,25 +19,7 @@ class RevenueBreakdownWidget extends Widget
 
     protected $listeners = ['dashboard-filter-changed' => '$refresh'];
 
-    /**
-     * Defer loading until visible; improves initial page load.
-     */
     protected static bool $isLazy = true;
-
-    /**
-     * @param  Builder<\Illuminate\Database\Eloquent\Model>  $query
-     * @return Builder<\Illuminate\Database\Eloquent\Model>
-     */
-    protected function dateScope(Builder $query): Builder
-    {
-        $range = DashboardDateFilter::getDateRange();
-
-        if ($range === null) {
-            return $query;
-        }
-
-        return $query->whereBetween('created_at', $range);
-    }
 
     protected function getViewData(): array
     {
@@ -62,26 +42,14 @@ class RevenueBreakdownWidget extends Widget
 
     private function computeRevenueData(): array
     {
-        // Revenue = when trip completed (ended_at), not when created
-        $query = Trip::query()->where('status', \App\Enums\TripStatus::COMPLETED->value);
         $range = DashboardDateFilter::getDateRange();
-        if ($range !== null) {
-            $query->whereBetween('ended_at', $range);
-        }
-        $totalRevenue = $query->sum('actual_fare') ?? 0;
-
-        $commissionRate = app(GeneralSettings::class)->commission_rate / 100;
-        $taxRate = 0.15;
-        $tax = $totalRevenue * $taxRate;
-        $total_without_tax = $totalRevenue - $tax;
-        $companyProfit = $total_without_tax * $commissionRate;
-        $driverProfit = $total_without_tax - $companyProfit;
+        $stats = app(FinancialReportService::class)->getStatCards($range);
 
         return [
-            'companyProfit' => $companyProfit,
-            'tax' => $tax,
-            'driverProfit' => $driverProfit,
-            'totalRevenue' => $totalRevenue,
+            'totalRevenue' => (float) ($stats['total_revenue'] ?? 0),
+            'companyProfit' => (float) ($stats['company_profit'] ?? 0),
+            'tax' => (float) ($stats['total_taxes'] ?? 0),
+            'driverProfit' => (float) ($stats['driver_earnings'] ?? 0),
         ];
     }
 }

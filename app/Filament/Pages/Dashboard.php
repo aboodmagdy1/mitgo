@@ -28,7 +28,6 @@ class Dashboard extends BaseDashboard
             Cache::forget($key);
         }
 
-        // Force RevenueBreakdownWidget to re-render with fresh data
         $this->dispatch('dashboard-filter-changed');
     }
 
