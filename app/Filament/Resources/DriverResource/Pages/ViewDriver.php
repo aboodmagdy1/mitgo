@@ -32,16 +32,16 @@ class ViewDriver extends ViewRecord
             
             // Approve Driver Action
             Actions\Action::make('approve_driver')
-                ->label(__('Approve Driver'))
+                ->label('موافقة على السائق')
                 ->icon('heroicon-o-check-badge')
                 ->color('success')
                 ->visible(fn ($record) => ! $record->isApproved())
                 ->form([
                     Forms\Components\Select::make('vehicle_type_id')
-                        ->label(__('Vehicle Type'))
+                        ->label('نوع المركبة')
                         ->options(VehicleType::where('active', true)->pluck('name', 'id'))
                         ->required()
-                        ->helperText(__('Please select a vehicle type for this driver when approving them.'))
+                        ->helperText('يرجى اختيار نوع المركبة لهذا السائق عند الموافقة عليه.')
                 ])
                 ->action(function ($record, array $data) {
                     try {
@@ -50,7 +50,7 @@ class ViewDriver extends ViewRecord
                         
                         if (!$approved) {
                             Notification::make()
-                                ->title(__('Driver is already approved'))
+                                ->title('السائق موافق عليه مسبقاً')
                                 ->warning()
                                 ->send();
                             return;
@@ -72,8 +72,8 @@ class ViewDriver extends ViewRecord
                         }
                         
                         Notification::make()
-                            ->title(__('Driver approved successfully'))
-                            ->body(__('Driver can now receive trip requests when active and online.'))
+                            ->title('تمت الموافقة على السائق بنجاح')
+                            ->body('يمكن للسائق الآن تلقي طلبات الرحلات عند كونه نشطاً ومتصلاً.')
                             ->success()
                             ->send();
                             
@@ -81,26 +81,26 @@ class ViewDriver extends ViewRecord
                         $this->refreshFormData(['record']);
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Error'))
-                            ->body(__('An error occurred: :error', ['error' => $e->getMessage()]))
+                            ->title('خطأ')
+                            ->body('حدث خطأ: ' . $e->getMessage())
                             ->danger()
                             ->send();
                     }
                 })
                 ->requiresConfirmation()
-                ->modalHeading(__('Approve Driver'))
-                ->modalDescription(__('Are you sure you want to approve this driver? This action cannot be undone.'))
-                ->modalSubmitActionLabel(__('Approve Driver')),
+                ->modalHeading('موافقة على السائق')
+                ->modalDescription('هل أنت متأكد من الموافقة على هذا السائق؟ لا يمكن التراجع عن هذا الإجراء.')
+                ->modalSubmitActionLabel('موافقة على السائق'),
             
             // Toggle Active/Deactivate Action
             Actions\Action::make('toggle_active')
-                ->label(fn ($record) => $record->user->is_active ? __('Deactivate') : __('Activate'))
+                ->label(fn ($record) => $record->user->is_active ? 'إلغاء التفعيل' : 'تفعيل')
                 ->icon(fn ($record) => $record->user->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                 ->color(fn ($record) => $record->user->is_active ? 'danger' : 'success')
                 ->action(function ($record) {
                     try {
                         $record->user->update(['is_active' => !$record->user->is_active]);
-                        $message = $record->user->is_active ? __('Driver activated successfully') : __('Driver deactivated successfully');
+                        $message = $record->user->is_active ? 'تم تفعيل السائق بنجاح' : 'تم إلغاء تفعيل السائق بنجاح';
                             
                         Notification::make()
                             ->title($message)
@@ -111,27 +111,27 @@ class ViewDriver extends ViewRecord
                         $this->refreshFormData(['record']);
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Error'))
-                            ->body(__('An error occurred: :error', ['error' => $e->getMessage()]))
+                            ->title('خطأ')
+                            ->body('حدث خطأ: ' . $e->getMessage())
                             ->danger()
                             ->send();
                     }
                 })
                 ->requiresConfirmation()
-                ->modalHeading(fn ($record) => $record->user->is_active ? __('Deactivate Driver') : __('Activate Driver'))
+                ->modalHeading(fn ($record) => $record->user->is_active ? 'إلغاء تفعيل السائق' : 'تفعيل السائق')
                 ->modalDescription(fn ($record) => $record->user->is_active 
-                    ? __('Are you sure you want to deactivate this driver? They will not be able to login.')
-                    : __('Are you sure you want to activate this driver account?'))
-                ->modalSubmitActionLabel(fn ($record) => $record->user->is_active ? __('Deactivate') : __('Activate')),
+                    ? 'هل أنت متأكد من إلغاء تفعيل هذا السائق؟ لن يتمكن من تسجيل الدخول.'
+                    : 'هل أنت متأكد من تفعيل حساب هذا السائق؟')
+                ->modalSubmitActionLabel(fn ($record) => $record->user->is_active ? 'إلغاء التفعيل' : 'تفعيل'),
             
             // Withdraw Action
             Actions\Action::make('withdraw')
-                ->label(__('wallet.withdraw'))
+                ->label('سحب')
                 ->icon('heroicon-o-minus-circle')
                 ->color('danger')
                 ->form([
                     Forms\Components\TextInput::make('amount')
-                        ->label(__('wallet.amount'))
+                        ->label('المبلغ')
                         ->numeric()
                         ->required()
                         ->step(0.01)
@@ -139,11 +139,11 @@ class ViewDriver extends ViewRecord
                         ->prefix('SAR')
                         ->helperText(function () {
                             $balance = $this->record->getFormattedBalanceAttribute();
-                            return __('wallet.current_balance') . ': ' . $balance;
+                            return 'الرصيد الحالي: ' . $balance;
                         }),
                     Forms\Components\Textarea::make('notes')
-                        ->label(__('wallet.notes'))
-                        ->placeholder(__('wallet.reason_for_withdrawal') . '...')
+                        ->label('الملاحظات')
+                        ->placeholder('سبب السحب...')
                         ->required()
                         ->rows(3),
                 ])
@@ -154,8 +154,8 @@ class ViewDriver extends ViewRecord
                     
                     if (!$driver->canWithdraw($amount)) {
                         Notification::make()
-                            ->title(__('wallet.insufficient_balance'))
-                            ->body(__('Driver does not have sufficient balance for this withdrawal.'))
+                            ->title('رصيد غير كافٍ')
+                            ->body('لا يمتلك السائق رصيداً كافياً لهذا السحب.')
                             ->danger()
                             ->send();
                         return;
@@ -169,42 +169,40 @@ class ViewDriver extends ViewRecord
                         ]);
 
                         Notification::make()
-                            ->title(__('wallet.withdrawal_successful'))
-                            ->body(__('Amount :amount has been withdrawn from driver wallet.', [
-                                'amount' => $data['amount'] . ' SAR'
-                            ]))
+                            ->title('تم السحب بنجاح')
+                            ->body('تم سحب المبلغ ' . $data['amount'] . ' SAR من محفظة السائق.')
                             ->success()
                             ->send();
                             
                         $this->refreshFormData(['driver']);
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Error Processing Withdrawal'))
-                            ->body(__('An error occurred: :error', ['error' => $e->getMessage()]))
+                            ->title('خطأ في معالجة السحب')
+                            ->body('حدث خطأ: ' . $e->getMessage())
                             ->danger()
                             ->send();
                     }
                 })
                 ->requiresConfirmation()
-                ->modalHeading(__('wallet.withdraw_from_wallet'))
-                ->modalDescription(__('This will immediately deduct the amount from the driver\'s wallet.'))
-                ->modalSubmitActionLabel(__('wallet.withdraw')),
+                ->modalHeading('سحب من المحفظة')
+                ->modalDescription('سيتم خصم المبلغ فوراً من محفظة السائق.')
+                ->modalSubmitActionLabel('سحب'),
 
             // Deposit Action
             Actions\Action::make('deposit')
-                ->label(__('wallet.deposit'))
+                ->label('إيداع')
                 ->icon('heroicon-o-plus-circle')
                 ->color('success')
                 ->form([
                     Forms\Components\TextInput::make('amount')
-                        ->label(__('wallet.amount'))
+                        ->label('المبلغ')
                         ->numeric()
                         ->required()
                         
                         ->prefix('SAR'),
                     Forms\Components\Textarea::make('notes')
-                        ->label(__('wallet.notes'))
-                        ->placeholder(__('wallet.reason_for_deposit') . '...')
+                        ->label('الملاحظات')
+                        ->placeholder('سبب الإيداع...')
                         ->required()
                         ->rows(3),
                 ])
@@ -221,26 +219,24 @@ class ViewDriver extends ViewRecord
                         ]);
 
                         Notification::make()
-                            ->title(__('wallet.deposit_successful'))
-                            ->body(__('Amount :amount has been deposited to driver wallet.', [
-                                'amount' => $data['amount'] . ' SAR'
-                            ]))
+                            ->title('تم الإيداع بنجاح')
+                            ->body('تم إيداع المبلغ ' . $data['amount'] . ' SAR في محفظة السائق.')
                             ->success()
                             ->send();
                             
                         $this->refreshFormData(['driver']);
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Error Processing Deposit'))
-                            ->body(__('An error occurred: :error', ['error' => $e->getMessage()]))
+                            ->title('خطأ في معالجة الإيداع')
+                            ->body('حدث خطأ: ' . $e->getMessage())
                             ->danger()
                             ->send();
                     }
                 })
                 ->requiresConfirmation()
-                ->modalHeading(__('wallet.deposit_to_wallet'))
-                ->modalDescription(__('This will immediately add the amount to the driver\'s wallet.'))
-                ->modalSubmitActionLabel(__('wallet.deposit')),
+                ->modalHeading('إيداع في المحفظة')
+                ->modalDescription('سيتم إضافة المبلغ فوراً إلى محفظة السائق.')
+                ->modalSubmitActionLabel('إيداع'),
         ];
     }
 
@@ -253,63 +249,63 @@ class ViewDriver extends ViewRecord
                     ->contained(false)
                     ->columnSpanFull()
                     ->tabs([
-                        Tabs\Tab::make(__('General Information'))
+                        Tabs\Tab::make('المعلومات العامة')
                             ->icon('heroicon-o-user')
                             ->schema([
-                                Section::make(__('Personal Information'))
+                                Section::make('المعلومات الشخصية')
                                     ->icon('heroicon-o-user')
                                     ->schema([
                                         // driver have avatar using user->getFirstMediaUrl("avatar")
                                         SpatieMediaLibraryImageEntry::make('user.avatar')
-                                            ->label(__('Avatar'))
+                                            ->label('الصورة الشخصية')
                                             ->collection('avatar')
                                             ->columnSpan(2),
                                         TextEntry::make('user.name')
-                                            ->label(__('Name'))
+                                            ->label('الاسم')
                                             ->icon('heroicon-o-user'),
                                         TextEntry::make('user.email')
-                                            ->label(__('Email'))
+                                            ->label('البريد الإلكتروني')
                                             ->icon('heroicon-o-envelope')
                                             ->copyable(),
                                         TextEntry::make('user.phone')
-                                            ->label(__('Phone'))
+                                            ->label('رقم الهاتف')
                                             ->icon('heroicon-o-phone')
                                             ->copyable(),
                                         TextEntry::make('user.city.name')
-                                            ->label(__('City'))
+                                            ->label('المدينة')
                                             ->icon('heroicon-o-map-pin'),
                                         TextEntry::make('user.is_active')
-                                            ->label(__('Account Status'))
+                                            ->label('حالة الحساب')
                                             ->badge()
-                                            ->formatStateUsing(fn (?bool $state): string => $state ? __('Active') : __('Inactive'))
+                                            ->formatStateUsing(fn (?bool $state): string => $state ? 'نشط' : 'غير نشط')
                                             ->color(fn (?bool $state): string => $state ? 'success' : 'danger'),
                                     ])->columns(2),
 
-                                Section::make(__('Driver Information'))
+                                Section::make('معلومات السائق')
                                     ->icon('heroicon-o-identification')
                                     ->schema([
                                         TextEntry::make('date_of_birth')
-                                            ->label(__('Date of Birth'))
+                                            ->label('تاريخ الميلاد')
                                             ->date(),
                                         TextEntry::make('national_id')
-                                            ->label(__('National ID'))
+                                            ->label('رقم الهوية')
                                             ->copyable(),
                                         
                                         TextEntry::make('absher_phone')
-                                            ->label(__('Absher Phone'))
+                                            ->label('رقم أبشر')
                                             ->copyable(),
                                         TextEntry::make('approval_status')
-                                            ->label(__('Approval Status'))
+                                            ->label('حالة الموافقة')
                                             ->badge()
                                             ->formatStateUsing(fn ($state): string => \App\Filament\Resources\BaseDriverResource::normalizeApprovalStatus($state)->label())
                                             ->color(fn ($state): string => \App\Filament\Resources\BaseDriverResource::normalizeApprovalStatus($state)->color()),
                                         TextEntry::make('status')
-                                            ->label(__('Driver Status'))
+                                            ->label('حالة السائق')
                                             ->badge()
                                             ->formatStateUsing(fn (?int $state): string => match ($state) {
-                                                0 => __('Offline'),
-                                                1 => __('Online'),
-                                                default => __('Unknown'),
+                                                0 => 'غير متصل',
+                                                1 => 'متصل',
+                                                default => 'غير معروف',
                                             })
                                             ->color(fn (?int $state): string => match ($state) {
                                                 0 => 'danger',
@@ -318,75 +314,75 @@ class ViewDriver extends ViewRecord
                                             }),
                                     ])->columns(2),
 
-                                Section::make(__('Vehicle Information'))
+                                Section::make('معلومات المركبة')
                                     ->icon('heroicon-o-truck')
                                     ->schema([
                                         TextEntry::make('vehicle.vehicleType.name')
-                                            ->label(__('Vehicle Type'))
-                                            ->placeholder(__('No vehicle type')),
+                                            ->label('نوع المركبة')
+                                            ->placeholder('لا يوجد نوع مركبة'),
                                         TextEntry::make('vehicle.vehicleBrandModel.vehicleBrand.name')
-                                            ->label(__('Vehicle Brand'))
-                                            ->placeholder(__('No vehicle brand')),
+                                            ->label('ماركة المركبة')
+                                            ->placeholder('لا توجد ماركة مركبة'),
                                         TextEntry::make('vehicle.vehicleBrandModel.name')
-                                            ->label(__('Vehicle Model'))
-                                            ->placeholder(__('No vehicle model')),
+                                            ->label('موديل المركبة')
+                                            ->placeholder('لا يوجد موديل مركبة'),
                                         TextEntry::make('vehicle.color')
-                                            ->label(__('Color'))
-                                            ->placeholder(__('No color specified')),
+                                            ->label('اللون')
+                                            ->placeholder('لم يتم تحديد اللون'),
                                         TextEntry::make('vehicle.plate_number')
-                                            ->label(__('Plate Number'))
+                                            ->label('رقم اللوحة')
                                             ->copyable()
-                                            ->placeholder(__('No plate number')),
+                                            ->placeholder('لا يوجد رقم لوحة'),
                                         TextEntry::make('vehicle.license_number')
-                                            ->label(__('Vehicle License'))
+                                            ->label('رخصة المركبة')
                                             ->copyable()
-                                            ->placeholder(__('No license number')),
+                                            ->placeholder('لا يوجد رقم رخصة'),
                                         TextEntry::make('vehicle.seats')
-                                            ->label(__('Number of Seats'))
-                                            ->placeholder(__('No seats specified')),
+                                            ->label('عدد المقاعد')
+                                            ->placeholder('لم يتم تحديد المقاعد'),
                                     ])->columns(2),
 
-                                Section::make(__('Statistics'))
+                                Section::make('الإحصائيات')
                                     ->icon('heroicon-o-chart-bar')
                                     ->schema([
                                         TextEntry::make('trips_count')
-                                            ->label(__('Total Trips'))
+                                            ->label('إجمالي الرحلات')
                                             ->state(fn ($record) => $record->trips()->count()),
                                         TextEntry::make('ratings_count')
-                                            ->label(__('Total Ratings'))
+                                            ->label('إجمالي التقييمات')
                                             ->state(fn ($record) => $record->ratings()->count()),
                                         TextEntry::make('average_rating')
-                                            ->label(__('Average Rating'))
+                                            ->label('متوسط التقييم')
                                             ->state(function ($record) {
                                                 $avgRating = $record->averageRating();
-                                                return $avgRating ? number_format($avgRating, 2) . ' ★' : __('No ratings yet');
+                                                return $avgRating ? number_format($avgRating, 2) . ' ★' : 'لا توجد تقييمات بعد';
                                             }),
                                         \Filament\Infolists\Components\ViewEntry::make('trip_request_rates')
-                                            ->label(__('Trip Request Rates'))
+                                            ->label('معدلات طلبات الرحلات')
                                             ->view('filament.infolists.components.driver-request-rates')
                                             ->state(fn ($record) => app(TripRequestLogService::class)->getDriverRates($record->id))
                                             ->columnSpanFull(),
                                         TextEntry::make('user.created_at')
-                                            ->label(__('Joined Date'))
+                                            ->label('تاريخ الانضمام')
                                             ->dateTime(),
                                     ])->columns(2),
                             ]),
 
-                        Tabs\Tab::make(__('Wallet & Transactions'))
+                        Tabs\Tab::make('المحفظة والمعاملات')
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
-                                Section::make(__('wallet.wallet_information'))
+                                Section::make('معلومات المحفظة')
                                     ->icon('heroicon-o-banknotes')
                                     ->columnSpanFull()
                                     ->schema([
                                         TextEntry::make('formatted_balance')
-                                            ->label(__('Current Balance'))
+                                            ->label('الرصيد الحالي')
                                             ->badge()
                                             ->color('success')
                                             ->size(TextEntry\TextEntrySize::Large)
                                             ->weight(FontWeight::Bold),
                                         TextEntry::make('pending_withdrawals')
-                                            ->label(__('Pending Withdrawals'))
+                                            ->label('طلبات السحب المعلقة')
                                             ->state(function ($record) {
                                                 try {
                                                     // Force fresh query to avoid any caching issues
@@ -402,7 +398,7 @@ class ViewDriver extends ViewRecord
                                             ->badge()
                                             ->color('warning'),
                                         TextEntry::make('total_withdrawals')
-                                            ->label(__('Total Approved Withdrawals'))
+                                            ->label('إجمالي السحوبات المعتمدة')
                                             ->state(function ($record) {
                                                 try {
                                                     // Force fresh query to avoid any caching issues
@@ -419,7 +415,7 @@ class ViewDriver extends ViewRecord
                                             ->color('info'),
                                     ])->columns(3),
 
-                                Section::make(__('wallet.recent_transactions'))
+                                Section::make('المعاملات الأخيرة')
                                     ->icon('heroicon-o-list-bullet')
                                     ->columnSpanFull()
                                     ->collapsible()
@@ -434,7 +430,7 @@ class ViewDriver extends ViewRecord
                                             }),
                                     ]),
 
-                                Section::make(__('wallet.withdraw_requests'))
+                                Section::make('طلبات السحب')
                                     ->icon('heroicon-o-minus-circle')
                                     ->columnSpanFull()
                                     ->collapsible()
@@ -450,10 +446,10 @@ class ViewDriver extends ViewRecord
                                     ]),
                             ]),
 
-                        Tabs\Tab::make(__('Driver Trips'))
+                        Tabs\Tab::make('رحلات السائق')
                             ->icon('heroicon-o-map')
                             ->schema([
-                                Section::make(__('Driver Trips'))
+                                Section::make('رحلات السائق')
                                     ->icon('heroicon-o-map')
                                     ->columnSpanFull()
                                     ->collapsible()

@@ -21,7 +21,7 @@ class ViewFemaleDriver extends ViewRecord
             Actions\EditAction::make(),
 
             Actions\Action::make('toggle_active')
-                ->label(fn ($record) => $record->user->is_active ? __('Deactivate') : __('Activate'))
+                ->label(fn ($record) => $record->user->is_active ? 'إلغاء التفعيل' : 'تفعيل')
                 ->icon(fn ($record) => $record->user->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                 ->color(fn ($record) => $record->user->is_active ? 'danger' : 'success')
                 ->action(function ($record) {
@@ -32,59 +32,59 @@ class ViewFemaleDriver extends ViewRecord
                         $record->user->tokens()->delete();
                     }
                     Notification::make()
-                        ->title($record->user->is_active ? __('Driver activated successfully') : __('Driver deactivated successfully'))
+                        ->title($record->user->is_active ? 'تم تفعيل السائق بنجاح' : 'تم إلغاء تفعيل السائق بنجاح')
                         ->success()->send();
                 })
                 ->requiresConfirmation()
-                ->modalHeading(fn ($record) => $record->user->is_active ? __('Deactivate Driver') : __('Activate Driver'))
+                ->modalHeading(fn ($record) => $record->user->is_active ? 'إلغاء تفعيل السائق' : 'تفعيل السائق')
                 ->modalDescription(fn ($record) => $record->user->is_active
-                    ? __('Are you sure you want to deactivate this driver? They will not be able to login.')
-                    : __('Are you sure you want to activate this driver account?'))
-                ->modalSubmitActionLabel(fn ($record) => $record->user->is_active ? __('Deactivate') : __('Activate')),
+                    ? 'هل أنت متأكد من إلغاء تفعيل هذا السائق؟ لن يتمكن من تسجيل الدخول.'
+                    : 'هل أنت متأكد من تفعيل حساب هذا السائق؟')
+                ->modalSubmitActionLabel(fn ($record) => $record->user->is_active ? 'إلغاء التفعيل' : 'تفعيل'),
 
             Actions\Action::make('withdraw')
-                ->label(__('wallet.withdraw'))
+                ->label('سحب')
                 ->icon('heroicon-o-minus-circle')
                 ->color('danger')
                 ->form([
                     Forms\Components\TextInput::make('amount')
-                        ->label(__('wallet.amount'))
+                        ->label('المبلغ')
                         ->numeric()->required()->step(0.01)->minValue(0.01)->prefix('SAR')
-                        ->helperText(fn () => __('wallet.current_balance') . ': ' . $this->record->getFormattedBalanceAttribute()),
+                        ->helperText(fn () => 'الرصيد الحالي: ' . $this->record->getFormattedBalanceAttribute()),
                     Forms\Components\Textarea::make('notes')
-                        ->label(__('wallet.notes'))->required()->rows(3),
+                        ->label('الملاحظات')->required()->rows(3),
                 ])
                 ->action(function (array $data): void {
                     $amount = $data['amount'] * 100;
                     if (! $this->record->canWithdraw($amount)) {
-                        Notification::make()->title(__('wallet.insufficient_balance'))->danger()->send();
+                        Notification::make()->title('رصيد غير كافي')->danger()->send();
                         return;
                     }
                     $this->record->withdraw($amount, ['description' => 'Admin withdrawal', 'notes' => $data['notes'], 'admin_id' => Auth::id()]);
-                    Notification::make()->title(__('wallet.withdrawal_successful'))->success()->send();
+                    Notification::make()->title('تم السحب بنجاح')->success()->send();
                 })
                 ->requiresConfirmation()
-                ->modalHeading(__('wallet.withdraw_from_wallet'))
-                ->modalSubmitActionLabel(__('wallet.withdraw')),
+                ->modalHeading('سحب من محفظة السائق')
+                ->modalSubmitActionLabel('سحب'),
 
             Actions\Action::make('deposit')
-                ->label(__('wallet.deposit'))
+                ->label('إيداع')
                 ->icon('heroicon-o-plus-circle')
                 ->color('success')
                 ->form([
                     Forms\Components\TextInput::make('amount')
-                        ->label(__('wallet.amount'))->numeric()->required()->prefix('SAR'),
+                        ->label('المبلغ')->numeric()->required()->prefix('SAR'),
                     Forms\Components\Textarea::make('notes')
-                        ->label(__('wallet.notes'))->required()->rows(3),
+                        ->label('الملاحظات')->required()->rows(3),
                 ])
                 ->action(function (array $data): void {
                     $amount = $data['amount'] * 100;
                     $this->record->deposit($amount, ['description' => 'Admin deposit', 'notes' => $data['notes'], 'admin_id' => Auth::id()]);
-                    Notification::make()->title(__('wallet.deposit_successful'))->success()->send();
+                    Notification::make()->title('تم الإيداع بنجاح')->success()->send();
                 })
                 ->requiresConfirmation()
-                ->modalHeading(__('wallet.deposit_to_wallet'))
-                ->modalSubmitActionLabel(__('wallet.deposit')),
+                ->modalHeading('إيداع في محفظة السائق')
+                ->modalSubmitActionLabel('إيداع'),
         ];
     }
 }

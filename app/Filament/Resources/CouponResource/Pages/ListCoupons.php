@@ -13,13 +13,13 @@ class ListCoupons extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label(__('Add Coupon')),
+            Actions\CreateAction::make()->label('إضافة كوبون'),
         ];
     }
 
     public function getTitle(): string
     {
-        return __('Coupons');
+        return 'الكوبونات';
     }
 }
 

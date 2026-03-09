@@ -27,76 +27,75 @@ class ZonePricingModifierResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Zone Pricing Modifiers');
+        return 'معدلات تسعير المناطق';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Zone Pricing Modifier');
+        return 'معدل تسعير المنطقة';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Zone Pricing Modifiers');
+        return 'معدلات تسعير المناطق';
     }
     public static function getNavigationGroup(): ?string
     {
-        return __('Trips Management');
+        return 'إدارة الرحلات';
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('Basic Information'))
+                Forms\Components\Section::make('المعلومات الأساسية')
                     ->schema([
                         Forms\Components\Select::make('zone_id')
-                            ->label(__('Zone'))
+                            ->label('المنطقة')
                             ->options(Zone::where('status', true)->pluck('name', 'id'))
                             ->required()
                             ->searchable()
                             ->preload(),
                         Forms\Components\TextInput::make('name')
-                            ->label(__('Name'))
+                            ->label('الاسم')
                             ->required()
-                            ->translateLabel()
                             ->maxLength(255),
                         Forms\Components\DatePicker::make('start_date')
-                            ->label(__('Start Date'))
+                            ->label('تاريخ البداية')
                             ->required(),
                         Forms\Components\DatePicker::make('end_date')
-                            ->label(__('End Date'))
+                            ->label('تاريخ النهاية')
                             ->required(),
                         Forms\Components\TextInput::make('multiplier')
-                            ->label(__('Percentage'))
+                            ->label('النسبة')
                             ->required()
                             ->numeric()
                             ->step(0.01)
                             ->minValue(0)
                             ->maxValue(99.99)
                             ->suffix('%')
-                            ->helperText(__('Enter percentage')),
+                            ->helperText('أدخل النسبة'),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('Time Settings'))
+                Forms\Components\Section::make('إعدادات الوقت')
                     ->schema([
                         Forms\Components\TimePicker::make('start_time')
-                            ->label(__('Start Time'))
+                            ->label('وقت البداية')
                             ->required()
                             ->seconds(false),
                         Forms\Components\TimePicker::make('end_time')
-                            ->label(__('End Time'))
+                            ->label('وقت النهاية')
                             ->required()
                             ->seconds(false)
                             ->after('start_time'),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('Status'))
+                Forms\Components\Section::make('الحالة')
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
-                            ->label(__('Active'))
+                            ->label('نشط')
                             ->default(true)
-                            ->helperText(__('Only active modifiers will be applied to pricing')),
+                            ->helperText('سيتم تطبيق المعدلات النشطة فقط على التسعير'),
                     ]),
             ]);
     }
@@ -106,55 +105,55 @@ class ZonePricingModifierResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('zone.name')
-                    ->label(__('Zone'))
+                    ->label('المنطقة')
                     ->searchable()
                     ->sortable()
                     ->badge(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('Name'))
+                    ->label('الاسم')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->label(__('Start Date'))
+                    ->label('تاريخ البداية')
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_date')
-                    ->label(__('End Date'))
+                    ->label('تاريخ النهاية')
                     ->date()
                     ->sortable(),
                     Tables\Columns\TextColumn::make('multiplier')
-                    ->label(__('Percentage'))
+                    ->label('النسبة')
                     ->formatStateUsing(fn ($state) => number_format($state, 0) . '%')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_time')
-                    ->label(__('Start Time'))
+                    ->label('وقت البداية')
                     ->time('H:i')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_time')
-                    ->label(__('End Time'))
+                    ->label('وقت النهاية')
                     ->time('H:i')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('zone_id')
-                    ->label(__('Zone'))
+                    ->label('المنطقة')
                     ->options(Zone::pluck('name', 'id'))
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
-                    ->trueLabel(__('Active only'))
-                    ->falseLabel(__('Inactive only'))
+                    ->trueLabel('النشط فقط')
+                    ->falseLabel('غير النشط فقط')
                     ->native(false),
             ])
             ->actions([

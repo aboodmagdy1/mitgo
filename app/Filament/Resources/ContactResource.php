@@ -34,14 +34,14 @@ class ContactResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('Name'))
+                    ->label('الاسم')
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
                     ->icon('heroicon-o-user'),
                     
                 Tables\Columns\TextColumn::make('email')
-                    ->label(__('Email'))
+                    ->label('البريد الإلكتروني')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-envelope')
@@ -50,14 +50,14 @@ class ContactResource extends Resource
                     
                     // 0 open , 1 closed
                 Tables\Columns\TextColumn::make('is_read')
-                    ->label(__('Open'))
+                    ->label('مفتوح')
                     ->sortable()
                     ->icon(fn($record) => $record->is_read ? 'heroicon-o-check-circle' : 'heroicon-o-x-circle')
                     ->color(fn($record) => $record->is_read ? 'success' : 'danger')
-                    ->formatStateUsing(fn($state) => $state == 0 ? __('Open') : __('Closed')),
+                    ->formatStateUsing(fn($state) => $state == 0 ? 'مفتوح' : 'مغلق'),
                     
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Received At'))
+                    ->label('تاريخ الاستلام')
                     ->dateTime('M j, Y H:i')
                     ->sortable()
                     ->icon('heroicon-o-clock')
@@ -70,7 +70,7 @@ class ContactResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->label(__('View Details'))
+                    ->label('عرض التفاصيل')
                     ->icon('heroicon-o-eye'),
                     
                 
@@ -79,12 +79,13 @@ class ContactResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->requiresConfirmation()
-                        ->label(__('Delete Selected')),
+                        ->label('حذف المحدد'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
             ->poll('30s');
+            
     }
 
     public static function getRelations(): array
@@ -104,17 +105,17 @@ class ContactResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Communication');
+        return 'الاتصال';
     }
 
     public static function getPluralLabel(): ?string
     {
-        return __('Contact Messages');
+        return 'رسائل الاتصال';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Contact Message');
+        return 'رسالة الاتصال';
     }
 
     public static function getNavigationBadge(): ?string

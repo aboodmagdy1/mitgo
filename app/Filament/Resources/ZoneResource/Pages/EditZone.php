@@ -13,7 +13,7 @@ class EditZone extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->label(__('Delete')),
+            Actions\DeleteAction::make()->label('حذف'),
         ];
     }
 }

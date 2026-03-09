@@ -29,7 +29,7 @@ class RevenueOverTimeChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_revenue_over_time');
+        return 'الإيرادات عبر الزمن';
     }
 
     protected function getOptions(): array
@@ -43,7 +43,7 @@ class RevenueOverTimeChart extends ApexChartWidget
                 'toolbar' => ['show' => true],
             ],
             'series' => [
-                ['name' => __('financial.revenue'), 'data' => $data['data']],
+                ['name' => 'الإيرادات', 'data' => $data['data']],
             ],
             'xaxis' => [
                 'categories' => $data['labels'],

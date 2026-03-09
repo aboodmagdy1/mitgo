@@ -59,77 +59,77 @@ abstract class BaseDriverResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make(__('User Information'))
+            Forms\Components\Section::make('معلومات المستخدم')
                 ->schema([
                     Forms\Components\TextInput::make('user.name')
-                        ->label(__('Name'))
+                        ->label('الاسم')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('user.email')
-                        ->label(__('Email'))
+                        ->label('البريد الإلكتروني')
                         ->email()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('user.phone')
-                        ->label(__('Phone'))
+                        ->label('رقم الهاتف')
                         ->tel()
                         ->required()
                         ->maxLength(255),
                     Forms\Components\Select::make('user.city_id')
-                        ->label(__('City'))
+                        ->label('المدينة')
                         ->relationship('user.city', 'name')
                         ->required()
                         ->searchable()
                         ->preload(),
                     Forms\Components\Toggle::make('user.is_active')
-                        ->label(__('Active'))
+                        ->label('نشط')
                         ->default(true),
                 ])->columns(2),
 
-            Forms\Components\Section::make(__('Driver Information'))
+            Forms\Components\Section::make('معلومات السائق')
                 ->schema([
                     Forms\Components\DatePicker::make('date_of_birth')
-                        ->label(__('Date of Birth'))
+                        ->label('تاريخ الميلاد')
                         ->required(),
                     Forms\Components\TextInput::make('national_id')
-                        ->label(__('National ID'))
+                        ->label('رقم الهوية الوطنية')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('absher_phone')
-                        ->label(__('Absher Phone'))
+                        ->label('هاتف أبشر')
                         ->tel()
                         ->required()
                         ->maxLength(255),
                     Forms\Components\Select::make('status')
-                        ->label(__('Driver Status'))
-                        ->options([0 => __('Offline'), 1 => __('Online')])
+                        ->label('حالة السائق')
+                        ->options([0 => 'غير متصل', 1 => 'متصل'])
                         ->default(0),
                     Forms\Components\Select::make('approval_status')
-                        ->label(__('Approval Status'))
+                        ->label('حالة الموافقة')
                         ->options([
-                            ApprovalStatus::PENDING->value     => __('Pending'),
-                            ApprovalStatus::IN_PROGRESS->value => __('In Progress'),
-                            ApprovalStatus::APPROVED->value    => __('Approved'),
-                            ApprovalStatus::REJECTED->value    => __('Rejected'),
+                            ApprovalStatus::PENDING->value     => 'قيد الانتظار',
+                            ApprovalStatus::IN_PROGRESS->value => 'قيد التنفيذ',
+                            ApprovalStatus::APPROVED->value    => 'موافق عليه',
+                            ApprovalStatus::REJECTED->value    => 'مرفوض',
                         ])
                         ->default(ApprovalStatus::PENDING->value)
                         ->required(),
                 ])->columns(2),
 
-            Forms\Components\Section::make(__('Vehicle Information'))
+            Forms\Components\Section::make('معلومات المركبة')
                 ->schema([
                     Forms\Components\Select::make('vehicle.vehicle_type_id')
-                        ->label(__('Vehicle Type'))
+                        ->label('تصنيف المركبة')
                         ->options(VehicleType::where('active', true)->pluck('name', 'id'))
                         ->required()
                         ->reactive(),
                     Forms\Components\Select::make('vehicle.vehicle_brand_id')
-                        ->label(__('Vehicle Brand'))
+                        ->label('ماركة المركبة')
                         ->options(VehicleBrand::where('active', true)->pluck('name', 'id'))
                         ->required()
                         ->reactive()
                         ->afterStateUpdated(fn ($state, callable $set) => $set('vehicle.vehicle_brand_model_id', null)),
                     Forms\Components\Select::make('vehicle.vehicle_brand_model_id')
-                        ->label(__('Vehicle Model'))
+                        ->label('موديل المركبة')
                         ->options(function (callable $get) {
                             $vehicleBrandId = $get('vehicle.vehicle_brand_id');
                             if (! $vehicleBrandId) {
@@ -143,16 +143,16 @@ abstract class BaseDriverResource extends Resource
                         ->reactive()
                         ->searchable(),
                     Forms\Components\TextInput::make('vehicle.color')
-                        ->label(__('Vehicle Color'))
+                        ->label('لون المركبة')
                         ->maxLength(255),
                     Forms\Components\TextInput::make('vehicle.license_number')
-                        ->label(__('Vehicle License Number'))
+                        ->label('رقم رخصة المركبة')
                         ->maxLength(255),
                     Forms\Components\TextInput::make('vehicle.plate_number')
-                        ->label(__('Plate Number'))
+                        ->label('رقم اللوحة')
                         ->maxLength(255),
                     Forms\Components\TextInput::make('vehicle.seats')
-                        ->label(__('Number of Seats'))
+                        ->label('عدد المقاعد')
                         ->numeric()
                         ->minValue(1)
                         ->maxValue(50),
@@ -171,29 +171,29 @@ abstract class BaseDriverResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('user.name')
-                    ->label(__('Name'))
+                    ->label('الاسم')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('user.phone')
-                    ->label(__('Phone'))
+                    ->label('رقم الهاتف')
                     ->searchable(),
                 TextColumn::make('user.email')
-                    ->label(__('Email'))
+                    ->label('البريد الإلكتروني')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.gender')
-                    ->label(__('Gender'))
-                    ->formatStateUsing(fn ($state) => $state === 'male' ? __('Male') : ($state === 'female' ? __('Female') : '-'))
+                    ->label('النوع')
+                    ->formatStateUsing(fn ($state) => $state === 'male' ? 'ذكر' : ($state === 'female' ? 'أنثى' : '-'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('user.city.name')
-                    ->label(__('City'))
+                    ->label('المدينة')
                     ->sortable(),
                 BooleanColumn::make('user.is_active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->trueIcon('heroicon-o-check-badge')
                     ->falseIcon('heroicon-o-x-circle'),
                 BadgeColumn::make('approval_status')
-                    ->label(__('Approval Status'))
+                    ->label('حالة الموافقة')
                     ->formatStateUsing(fn ($state): string => self::normalizeApprovalStatus($state)->label())
                     ->colors([
                         'warning' => fn ($state) => self::normalizeApprovalStatus($state) === ApprovalStatus::PENDING,
@@ -202,25 +202,25 @@ abstract class BaseDriverResource extends Resource
                         'danger'  => fn ($state) => self::normalizeApprovalStatus($state) === ApprovalStatus::REJECTED,
                     ]),
                 BadgeColumn::make('status')
-                    ->label(__('Driver Status'))
+                    ->label('حالة السائق')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        '0'     => __('Offline'),
-                        '1'     => __('Online'),
-                        default => __('Unknown'),
+                        '0'     => 'غير متصل',
+                        '1'     => 'متصل',
+                        default => 'غير معروف',
                     })
                     ->colors([
                         'danger'  => '0',
                         'success' => '1',
                     ]),
                 TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('city')
-                    ->label(__('City'))
+                    ->label('المدينة')
                     ->relationship('user.city', 'name')
                     ->searchable(),
             ])
@@ -231,39 +231,39 @@ abstract class BaseDriverResource extends Resource
 
                 // Move to In Progress — visible only for pending drivers
                 Tables\Actions\Action::make('move_to_in_progress')
-                    ->label(__('Move to Inspection'))
+                    ->label('نقل للمعاينة')
                     ->icon('heroicon-o-magnifying-glass')
                     ->color('info')
                     ->visible(fn ($record) => $record->isPendingApproval())
                     ->requiresConfirmation()
-                    ->modalHeading(__('Move to Inspection'))
-                    ->modalDescription(__('Are you sure you want to move this driver to the inspection stage?'))
+                    ->modalHeading('نقل للمعاينة')
+                    ->modalDescription('هل أنت متأكد من نقل هذا السائق لمرحلة المعاينة؟')
                     ->action(function ($record) {
                         $record->moveToInProgress();
                         \Filament\Notifications\Notification::make()
-                            ->title(__('Driver moved to inspection stage.'))
+                            ->title('تم نقل السائق لمرحلة المعاينة.')
                             ->info()
                             ->send();
                     }),
 
                 // Approve — visible only for in-progress drivers
                 Tables\Actions\Action::make('approve_driver')
-                    ->label(__('Approve Driver'))
+                    ->label('موافقة على السائق')
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->visible(fn ($record) => $record->isInProgress())
                     ->form([
                         Forms\Components\Select::make('vehicle_type_id')
-                            ->label(__('Vehicle Type'))
+                            ->label('تصنيف المركبة')
                             ->options(VehicleType::where('active', true)->pluck('name', 'id'))
                             ->required()
-                            ->helperText(__('Please select a vehicle type for this driver when approving them.')),
+                            ->helperText('يرجى اختيار نوع المركبة لهذا السائق عند الموافقة عليه.'),
                     ])
                     ->action(function ($record, array $data) {
                         $approved = $record->approve();
                         if (! $approved) {
                             \Filament\Notifications\Notification::make()
-                                ->title(__('Driver is already approved'))
+                                ->title('السائق موافق عليه مسبقاً')
                                 ->warning()
                                 ->send();
                             return;
@@ -285,36 +285,36 @@ abstract class BaseDriverResource extends Resource
                         // Activate user on approval
                         $record->user->update(['is_active' => true]);
                         \Filament\Notifications\Notification::make()
-                            ->title(__('Driver approved successfully'))
-                            ->body(__('Driver can now receive trip requests when active and online.'))
+                            ->title('تم الموافقة على السائق بنجاح')
+                            ->body('يمكن للسائق الآن استقبال طلبات الرحلات عندما يكون نشطاً ومتصلاً.')
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(__('Approve Driver'))
-                    ->modalDescription(__('Are you sure you want to approve this driver? This action cannot be undone.'))
-                    ->modalSubmitActionLabel(__('Approve Driver')),
+                    ->modalHeading('موافقة على السائق')
+                    ->modalDescription('هل أنت متأكد من الموافقة على هذا السائق؟ لا يمكن التراجع عن هذا الإجراء.')
+                    ->modalSubmitActionLabel('موافقة على السائق'),
 
                 // Reject — visible only for in-progress drivers
                 Tables\Actions\Action::make('reject_driver')
-                    ->label(__('Reject'))
+                    ->label('رفض')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->visible(fn ($record) => $record->isInProgress())
                     ->requiresConfirmation()
-                    ->modalHeading(__('Reject Driver'))
-                    ->modalDescription(__('Are you sure you want to reject this driver application?'))
+                    ->modalHeading('رفض السائق')
+                    ->modalDescription('هل أنت متأكد من رفض طلب هذا السائق؟')
                     ->action(function ($record) {
                         $record->reject();
                         \Filament\Notifications\Notification::make()
-                            ->title(__('Driver application rejected.'))
+                            ->title('تم رفض طلب السائق.')
                             ->danger()
                             ->send();
                     }),
 
                 // Toggle active — visible only for approved drivers
                 Tables\Actions\Action::make('toggle_active')
-                    ->label(fn ($record) => $record->user->is_active ? __('Deactivate') : __('Activate'))
+                    ->label(fn ($record) => $record->user->is_active ? 'إلغاء التفعيل' : 'تفعيل')
                     ->icon(fn ($record) => $record->user->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                     ->color(fn ($record) => $record->user->is_active ? 'danger' : 'success')
                     ->visible(fn ($record) => $record->isApproved())
@@ -326,19 +326,19 @@ abstract class BaseDriverResource extends Resource
                             $record->user->tokens()->delete();
                         }
                         $message = $record->user->is_active
-                            ? __('Driver activated successfully')
-                            : __('Driver deactivated successfully');
+                            ? 'تم تفعيل السائق بنجاح'
+                            : 'تم إلغاء تفعيل السائق بنجاح';
                         \Filament\Notifications\Notification::make()
                             ->title($message)
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(fn ($record) => $record->user->is_active ? __('Deactivate Driver') : __('Activate Driver'))
+                    ->modalHeading(fn ($record) => $record->user->is_active ? 'إلغاء تفعيل السائق' : 'تفعيل السائق')
                     ->modalDescription(fn ($record) => $record->user->is_active
-                        ? __('Are you sure you want to deactivate this driver? They will not be able to login.')
-                        : __('Are you sure you want to activate this driver account?'))
-                    ->modalSubmitActionLabel(fn ($record) => $record->user->is_active ? __('Deactivate') : __('Activate')),
+                        ? 'هل أنت متأكد من إلغاء تفعيل هذا السائق؟ لن يتمكن من تسجيل الدخول.'
+                        : 'هل أنت متأكد من تفعيل حساب هذا السائق؟')
+                    ->modalSubmitActionLabel(fn ($record) => $record->user->is_active ? 'إلغاء التفعيل' : 'تفعيل'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -362,64 +362,64 @@ abstract class BaseDriverResource extends Resource
                     ->contained(false)
                     ->columnSpanFull()
                     ->tabs([
-                        Tabs\Tab::make(__('General Information'))
+                        Tabs\Tab::make('المعلومات العامة')
                             ->icon('heroicon-o-user')
                             ->schema([
-                                Section::make(__('Personal Information'))
+                                Section::make('المعلومات الشخصية')
                                     ->icon('heroicon-o-user')
                                     ->schema([
                                         SpatieMediaLibraryImageEntry::make('user.avatar')
-                                            ->label(__('Avatar'))
+                                            ->label('الصورة الشخصية')
                                             ->collection('avatar')
                                             ->columnSpan(2),
                                         TextEntry::make('user.name')
-                                            ->label(__('Name'))
+                                            ->label('الاسم')
                                             ->icon('heroicon-o-user'),
                                         TextEntry::make('user.email')
-                                            ->label(__('Email'))
+                                            ->label('البريد الإلكتروني')
                                             ->icon('heroicon-o-envelope')
                                             ->copyable(),
                                         TextEntry::make('user.phone')
-                                            ->label(__('Phone'))
+                                            ->label('رقم الهاتف')
                                             ->icon('heroicon-o-phone')
                                             ->copyable(),
                                         TextEntry::make('user.city.name')
-                                            ->label(__('City'))
+                                            ->label('المدينة')
                                             ->icon('heroicon-o-map-pin'),
                                         TextEntry::make('user.gender')
-                                            ->label(__('Gender'))
-                                            ->formatStateUsing(fn ($state) => $state === 'male' ? __('Male') : ($state === 'female' ? __('Female') : '-')),
+                                            ->label('النوع')
+                                            ->formatStateUsing(fn ($state) => $state === 'male' ? 'ذكر' : ($state === 'female' ? 'أنثى' : '-')),
                                         TextEntry::make('user.is_active')
-                                            ->label(__('Account Status'))
+                                            ->label('حالة الحساب')
                                             ->badge()
-                                            ->formatStateUsing(fn (?bool $state): string => $state ? __('Active') : __('Inactive'))
+                                            ->formatStateUsing(fn (?bool $state): string => $state ? 'نشط' : 'غير نشط')
                                             ->color(fn (?bool $state): string => $state ? 'success' : 'danger'),
                                     ])->columns(2),
 
-                                Section::make(__('Driver Information'))
+                                Section::make('معلومات السائق')
                                     ->icon('heroicon-o-identification')
                                     ->schema([
                                         TextEntry::make('date_of_birth')
-                                            ->label(__('Date of Birth'))
+                                            ->label('تاريخ الميلاد')
                                             ->date(),
                                         TextEntry::make('national_id')
-                                            ->label(__('National ID'))
+                                            ->label('رقم الهوية الوطنية')
                                             ->copyable(),
                                         TextEntry::make('absher_phone')
-                                            ->label(__('Absher Phone'))
+                                            ->label('هاتف أبشر')
                                             ->copyable(),
                                         TextEntry::make('approval_status')
-                                            ->label(__('Approval Status'))
+                                            ->label('حالة الموافقة')
                                             ->badge()
                                             ->formatStateUsing(fn ($state): string => self::normalizeApprovalStatus($state)->label())
                                             ->color(fn ($state): string => self::normalizeApprovalStatus($state)->color()),
                                         TextEntry::make('status')
-                                            ->label(__('Driver Status'))
+                                            ->label('حالة السائق')
                                             ->badge()
                                             ->formatStateUsing(fn (?int $state): string => match ($state) {
-                                                0       => __('Offline'),
-                                                1       => __('Online'),
-                                                default => __('Unknown'),
+                                                0       => 'غير متصل',
+                                                1       => 'متصل',
+                                                default => 'غير معروف',
                                             })
                                             ->color(fn (?int $state): string => match ($state) {
                                                 0       => 'danger',
@@ -428,75 +428,75 @@ abstract class BaseDriverResource extends Resource
                                             }),
                                     ])->columns(2),
 
-                                Section::make(__('Vehicle Information'))
+                                Section::make('معلومات المركبة')
                                     ->icon('heroicon-o-truck')
                                     ->schema([
                                         TextEntry::make('vehicle.vehicleType.name')
-                                            ->label(__('Vehicle Type'))
-                                            ->placeholder(__('No vehicle type')),
+                                            ->label('تصنيف المركبة')
+                                            ->placeholder('لا يوجد تصنيف مركبة'),
                                         TextEntry::make('vehicle.vehicleBrandModel.vehicleBrand.name')
-                                            ->label(__('Vehicle Brand'))
-                                            ->placeholder(__('No vehicle brand')),
+                                            ->label('ماركة المركبة')
+                                            ->placeholder('لا توجد ماركة'),
                                         TextEntry::make('vehicle.vehicleBrandModel.name')
-                                            ->label(__('Vehicle Model'))
-                                            ->placeholder(__('No vehicle model')),
+                                            ->label('موديل المركبة')
+                                            ->placeholder('لا يوجد موديل'),
                                         TextEntry::make('vehicle.color')
-                                            ->label(__('Color'))
-                                            ->placeholder(__('No color specified')),
+                                            ->label('اللون')
+                                            ->placeholder('غير محدد'),
                                         TextEntry::make('vehicle.plate_number')
-                                            ->label(__('Plate Number'))
+                                            ->label('رقم اللوحة')
                                             ->copyable()
-                                            ->placeholder(__('No plate number')),
+                                            ->placeholder('لا يوجد رقم لوحة'),
                                         TextEntry::make('vehicle.license_number')
-                                            ->label(__('Vehicle License'))
+                                            ->label('رخصة المركبة')
                                             ->copyable()
-                                            ->placeholder(__('No license number')),
+                                            ->placeholder('لا يوجد رقم رخصة'),
                                         TextEntry::make('vehicle.seats')
-                                            ->label(__('Number of Seats'))
-                                            ->placeholder(__('No seats specified')),
+                                            ->label('عدد المقاعد')
+                                            ->placeholder('غير محدد'),
                                     ])->columns(2),
 
-                                Section::make(__('Statistics'))
+                                Section::make('الإحصائيات')
                                     ->icon('heroicon-o-chart-bar')
                                     ->schema([
                                         TextEntry::make('trips_count')
-                                            ->label(__('Total Trips'))
+                                            ->label('إجمالي الرحلات')
                                             ->state(fn ($record) => $record->trips()->count()),
                                         TextEntry::make('ratings_count')
-                                            ->label(__('Total Ratings'))
+                                            ->label('إجمالي التقييمات')
                                             ->state(fn ($record) => $record->ratings()->count()),
                                         TextEntry::make('average_rating')
-                                            ->label(__('Average Rating'))
+                                            ->label('متوسط التقييم')
                                             ->state(function ($record) {
                                                 $avg = $record->averageRating();
-                                                return $avg ? number_format($avg, 2) . ' ★' : __('No ratings yet');
+                                                return $avg ? number_format($avg, 2) . ' ★' : 'لا توجد تقييمات بعد';
                                             }),
                                         ViewEntry::make('trip_request_rates')
-                                            ->label(__('Trip Request Rates'))
+                                            ->label('معدلات طلبات الرحلات')
                                             ->view('filament.infolists.components.driver-request-rates')
                                             ->state(fn ($record) => app(TripRequestLogService::class)->getDriverRates($record->id))
                                             ->columnSpanFull(),
                                         TextEntry::make('user.created_at')
-                                            ->label(__('Joined Date'))
+                                            ->label('تاريخ الانضمام')
                                             ->dateTime(),
                                     ])->columns(2),
                             ]),
 
-                        Tabs\Tab::make(__('Wallet & Transactions'))
+                        Tabs\Tab::make('محفظة والمعاملات')
                             ->icon('heroicon-o-currency-dollar')
                             ->schema([
-                                Section::make(__('wallet.wallet_information'))
+                                Section::make('معلومات المحفظة')
                                     ->icon('heroicon-o-banknotes')
                                     ->columnSpanFull()
                                     ->schema([
                                         TextEntry::make('formatted_balance')
-                                            ->label(__('Current Balance'))
+                                            ->label('الرصيد الحالي')
                                             ->badge()
                                             ->color('success')
                                             ->size(TextEntry\TextEntrySize::Large)
                                             ->weight(FontWeight::Bold),
                                         TextEntry::make('pending_withdrawals')
-                                            ->label(__('Pending Withdrawals'))
+                                            ->label('السحوبات المعلقة')
                                             ->state(function ($record) {
                                                 $amount = \App\Models\DriverWithdrawRequest::where('driver_id', $record->id)
                                                     ->where('is_approved', false)->sum('amount') ?? 0;
@@ -505,7 +505,7 @@ abstract class BaseDriverResource extends Resource
                                             ->badge()
                                             ->color('warning'),
                                         TextEntry::make('total_withdrawals')
-                                            ->label(__('Total Approved Withdrawals'))
+                                            ->label('إجمالي السحوبات الموافق عليها')
                                             ->state(function ($record) {
                                                 $amount = \App\Models\DriverWithdrawRequest::where('driver_id', $record->id)
                                                     ->where('is_approved', true)->sum('amount') ?? 0;
@@ -515,7 +515,7 @@ abstract class BaseDriverResource extends Resource
                                             ->color('info'),
                                     ])->columns(3),
 
-                                Section::make(__('wallet.recent_transactions'))
+                                Section::make('المعاملات الأخيرة')
                                     ->icon('heroicon-o-list-bullet')
                                     ->columnSpanFull()
                                     ->collapsible()
@@ -525,7 +525,7 @@ abstract class BaseDriverResource extends Resource
                                             ->state(fn ($record) => $record->getWalletTransactions()->latest()->limit(10)->get()),
                                     ]),
 
-                                Section::make(__('wallet.withdraw_requests'))
+                                Section::make('طلبات السحب')
                                     ->icon('heroicon-o-minus-circle')
                                     ->columnSpanFull()
                                     ->collapsible()
@@ -536,10 +536,10 @@ abstract class BaseDriverResource extends Resource
                                     ]),
                             ]),
 
-                        Tabs\Tab::make(__('Driver Trips'))
+                        Tabs\Tab::make('رحلات السائق')
                             ->icon('heroicon-o-map')
                             ->schema([
-                                Section::make(__('Driver Trips'))
+                                Section::make('رحلات السائق')
                                     ->icon('heroicon-o-map')
                                     ->columnSpanFull()
                                     ->collapsible()
@@ -560,12 +560,12 @@ abstract class BaseDriverResource extends Resource
 
     public static function getLabel(): string
     {
-        return __('Driver');
+        return 'السائق';
     }
 
     public static function getPluralLabel(): string
     {
-        return __('Drivers');
+        return 'السائقين';
     }
 
     /**

@@ -13,14 +13,14 @@ class EditCancelTripReason extends EditRecord
 
     public function getTitle(): string
     {
-            return __('Edit Cancel Trip Reason');
+            return 'تعديل سبب إلغاء الرحلة';
     }
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make()
-                ->label(__('Delete')),
+                ->label('حذف'),
             Actions\LocaleSwitcher::make(),
         ];
     }

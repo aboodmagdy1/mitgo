@@ -13,7 +13,7 @@ class ListZones extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label(__('Create')),
+            Actions\CreateAction::make()->label('إنشاء'),
         ];  
     }
 }

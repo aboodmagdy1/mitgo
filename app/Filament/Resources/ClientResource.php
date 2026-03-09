@@ -24,7 +24,7 @@ class ClientResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-users';
     public static function getNavigationGroup(): ?string
     {
-        return __('Users');
+        return 'المستخدمين';
     }    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
@@ -230,6 +230,6 @@ class ClientResource extends Resource
 
     public static function getPluralLabel(): string
     {
-        return __('Clients');
+        return 'العملاء';
     }
 }

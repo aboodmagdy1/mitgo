@@ -35,159 +35,144 @@ class VehicleTypeResource extends Resource
     {
         return $form
             ->schema([
-                Section::make(__('Vehicle Type Information'))
+                Section::make('معلومات نوع المركبة')
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Name'))
-                            ->translateLabel()
+                            ->label('الاسم')
                             ->required(),
                         
                         TextInput::make('seats')
-                            ->label(__('Number of Seats'))
-                            ->translateLabel()
+                            ->label('عدد المقاعد')
                             ->numeric()
                             ->required()
                             ->default(0),
                         
                        
                         SpatieMediaLibraryFileUpload::make('icon')
-                            ->label(__('Icon'))
-                            ->translateLabel()
+                            ->label('الأيقونة')
                             ->collection('icon')
                             ->image(),
 
                         Toggle::make('active')
-                            ->label(__('Active'))
-                            ->translateLabel()
+                            ->label('نشط')
                             ->default(true),
                     ])
                     ->columns(2),
                 
-                Section::make(__('Default Pricing'))
-                    ->description(__('Default pricing configuration used when no zone-specific pricing is available'))
+                Section::make('التسعير الافتراضي')
+                    ->description('إعدادات التسعير الافتراضية المستخدمة عندما لا يتوفر تسعير خاص بالمنطقة')
                     ->schema([
                         TextInput::make('defaultPricing.base_fare')
-                            ->label(__('Base Fare'))
-                            ->translateLabel()
+                            ->label('الأجرة الأساسية')
                             ->numeric()
                             ->step(0.01)
                             ->minValue(0)
                             ->required()
-                            ->placeholder(__('Enter base fare amount')),
+                            ->placeholder('أدخل مبلغ الأجرة الأساسية'),
                         
                         TextInput::make('defaultPricing.fare_per_km')
-                            ->label(__('Fare per KM'))
-                            ->translateLabel()
+                            ->label('الأجرة لكل كيلومتر')
                             ->numeric()
                             ->step(0.01)
                             ->minValue(0)
                             ->required()
-                            ->placeholder(__('Enter fare per kilometer')),
+                            ->placeholder('أدخل الأجرة لكل كيلومتر'),
                         
                         TextInput::make('defaultPricing.fare_per_minute')
-                            ->label(__('Fare per Minute'))
-                            ->translateLabel()
+                            ->label('الأجرة لكل دقيقة')
                             ->numeric()
                             ->step(0.01)
                             ->minValue(0)
                             ->required()
-                            ->placeholder(__('Enter fare per minute')),
+                            ->placeholder('أدخل الأجرة لكل دقيقة'),
                         
                         TextInput::make('defaultPricing.cancellation_fee')
-                            ->label(__('Cancellation Fee'))
-                            ->translateLabel()
+                            ->label('رسوم الإلغاء')
                             ->numeric()
                             ->step(0.01)
                             ->minValue(0)
                             ->required()
-                            ->placeholder(__('Enter cancellation fee')),
+                            ->placeholder('أدخل رسوم الإلغاء'),
                         
                         TextInput::make('defaultPricing.waiting_fee')
-                            ->label(__('Waiting Fee'))
-                            ->translateLabel()
+                            ->label('رسوم الانتظار')
                             ->numeric()
                             ->step(0.01)
                             ->minValue(0)
                             ->required()
-                            ->placeholder(__('Enter waiting fee per minute')),
+                            ->placeholder('أدخل رسوم الانتظار لكل دقيقة'),
                     ])
                     ->columns(3)
                     ->collapsed(),
                 
-                Section::make(__('Zone Pricing'))
+                Section::make('تسعير المناطق')
                     ->schema([
                         Repeater::make('zonePricing')
-                            ->label(__('Pricing for each zone'))
+                            ->label('التسعير لكل منطقة')
                             ->relationship('zonePricing')
                             ->schema([
                                 Select::make('zone_id')
-                                    ->label(__('Zone'))
+                                    ->label('المنطقة')
                                     ->options(Zone::where('status', true)->pluck('name', 'id'))
                                     ->required()
                                     ->searchable()
                                     ->preload(),
                                 
                                 TextInput::make('base_fare')
-                                    ->label(__('Base Fare'))
-                                    ->translateLabel()
+                                    ->label('الأجرة الأساسية')
                                     ->numeric()
                                     ->step(0.01)
                                     ->minValue(0)
                                     ->required()
-                                    ->placeholder(__('Enter base fare amount')),
+                                    ->placeholder('أدخل مبلغ الأجرة الأساسية'),
                                 
                                 TextInput::make('fare_per_km')
-                                    ->label(__('Fare per KM'))
-                                    ->translateLabel()
+                                    ->label('الأجرة لكل كيلومتر')
                                     ->numeric()
                                     ->step(0.01)
                                     ->minValue(0)
                                     ->required()
-                                    ->placeholder(__('Enter fare per kilometer')),
+                                    ->placeholder('أدخل الأجرة لكل كيلومتر'),
                                 
                                 TextInput::make('fare_per_minute')
-                                    ->label(__('Fare per Minute'))
-                                    ->translateLabel()
+                                    ->label('الأجرة لكل دقيقة')
                                     ->numeric()
                                     ->step(0.01)
                                     ->minValue(0)
                                     ->required()
-                                    ->placeholder(__('Enter fare per minute')),
+                                    ->placeholder('أدخل الأجرة لكل دقيقة'),
                                 
                                 TextInput::make('cancellation_fee')
-                                    ->label(__('Cancellation Fee'))
-                                    ->translateLabel()
+                                    ->label('رسوم الإلغاء')
                                     ->numeric()
                                     ->step(0.01)
                                     ->minValue(0)
                                     ->required()
-                                    ->placeholder(__('Enter cancellation fee')),
+                                    ->placeholder('أدخل رسوم الإلغاء'),
                                 
                                 TextInput::make('waiting_fee')
-                                    ->label(__('Waiting Fee'))
-                                    ->translateLabel()
+                                    ->label('رسوم الانتظار')
                                     ->numeric()
                                     ->step(0.01)
                                     ->minValue(0)
                                     ->required()
-                                    ->placeholder(__('Enter waiting fee per minute')),
+                                    ->placeholder('أدخل رسوم الانتظار لكل دقيقة'),
                                 
                                 TextInput::make('extra_fare')
-                                    ->label(__('Extra Fare'))
-                                    ->translateLabel()
+                                    ->label('أجرة إضافية')
                                     ->numeric()
                                     ->step(0.01)
                                     ->minValue(0)
                                     ->required()
-                                    ->placeholder(__('Enter extra fare amount')),
+                                    ->placeholder('أدخل مبلغ الأجرة الإضافية'),
                             ])
                             ->columns(3)
-                            ->addActionLabel(__('Add Zone Pricing'))
+                            ->addActionLabel('إضافة تسعير المنطقة')
                             ->reorderableWithButtons()
                             ->collapsible()
                             ->itemLabel(fn (array $state): ?string => Zone::find($state['zone_id'])?->name ?? null)
                             ->defaultItems(0)
-                            ->createItemButtonLabel(__('Add Zone Pricing'))
+                            ->createItemButtonLabel('إضافة تسعير المنطقة')
                     ])
                     ->collapsed(),
             ]);
@@ -198,35 +183,31 @@ class VehicleTypeResource extends Resource
         return $table       
             ->columns([
                 SpatieMediaLibraryImageColumn::make('icon')
-                    ->label(__('Icon'))
+                    ->label('الأيقونة')
                     ->collection('icon')
                     ->circular()
                     ->size(50),
 
                 TextColumn::make('name')
-                    ->label(__('Name'))
-                    ->translateLabel()
+                    ->label('الاسم')
                     ->searchable()
                     ->sortable(),
                 
                 TextColumn::make('seats')
-                    ->label(__('Seats'))
-                    ->translateLabel()
+                    ->label('المقاعد')
                     ->sortable(),
                 
                
                 
                 BooleanColumn::make('active')
-                    ->label(__('Active'))
-                    ->translateLabel()
+                    ->label('نشط')
                     ->sortable(),
                 
                 
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('active')
-                    ->label(__('Active'))
-                    ->translateLabel(),
+                    ->label('نشط'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -260,16 +241,16 @@ class VehicleTypeResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Vehicle Management');
+        return 'إدارة المركبات';
     }
 
     public static function getPluralLabel(): ?string
     {
-        return __('Vehicle Types');
+        return 'تصنيفات المركبات';
     }
 
     public static function getLabel(): ?string
     {
-        return __('Vehicle Type');
+        return 'تصنيف المركبة';
     }
 }

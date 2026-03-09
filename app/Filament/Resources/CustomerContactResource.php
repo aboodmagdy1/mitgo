@@ -8,17 +8,17 @@ class CustomerContactResource extends ContactResourceBase
 {
     public static function getNavigationLabel(): string
     {
-        return __('Customers Section');
+        return 'قسم العملاء';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Customer Contact Message');
+        return 'رسالة تواصل عميل';
     }
 
     public static function getPluralLabel(): ?string
     {
-        return __('Customer Contact Messages');
+        return 'رسائل تواصل العملاء';
     }
 
     public static function getNavigationSort(): ?int

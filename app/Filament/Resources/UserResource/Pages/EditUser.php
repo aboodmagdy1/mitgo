@@ -13,7 +13,7 @@ class EditUser extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->modalHeading(__('Delete User')),
+            Actions\DeleteAction::make()->modalHeading('حذف المستخدم'),
         ];
     }
 

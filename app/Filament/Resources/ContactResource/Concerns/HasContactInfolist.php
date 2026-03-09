@@ -15,45 +15,45 @@ trait HasContactInfolist
     {
         return $infolist
             ->schema([
-                Section::make(__('Contact Information'))
-                    ->description(__('Details about the person who contacted us'))
+                Section::make('معلومات الاتصال')
+                    ->description('تفاصيل عن الشخص الذي اتصل بنا')
                     ->icon('heroicon-o-user')
                     ->schema([
                         Grid::make(4)
                             ->schema([
                                 TextEntry::make('name')
-                                    ->label(__('Full Name'))
+                                    ->label('الاسم الكامل')
                                     ->size(TextEntry\TextEntrySize::Large)
                                     ->weight(FontWeight::Bold)
                                     ->color('primary')
                                     ->icon('heroicon-o-user')
                                     ->iconPosition(IconPosition::Before)
                                     ->copyable()
-                                    ->copyMessage(__('Name copied to clipboard')),
+                                    ->copyMessage('تم نسخ الاسم إلى الحافظة'),
 
                                 TextEntry::make('email')
-                                    ->label(__('Email'))
+                                    ->label('البريد الإلكتروني')
                                     ->color('info')
                                     ->icon('heroicon-o-envelope')
                                     ->iconPosition(IconPosition::Before)
                                     ->copyable()
-                                    ->copyMessage(__('Email copied to clipboard'))
+                                    ->copyMessage('تم نسخ البريد الإلكتروني إلى الحافظة')
                                     ->url(fn ($record) => 'mailto:' . $record->email)
                                     ->openUrlInNewTab(),
                             ]),
                     ])
                     ->collapsible(),
 
-                Section::make(__('Message Content'))
-                    ->description(__('The message content sent by the contact'))
+                Section::make('محتوى الرسالة')
+                    ->description('محتوى الرسالة المرسلة من قبل الاتصال')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
                         Grid::make(1)
                             ->schema([
                                 TextEntry::make('message')
-                                    ->label(__('Message'))
+                                    ->label('الرسالة')
                                     ->columnSpanFull()
-                                    ->placeholder(__('No message content provided'))
+                                    ->placeholder('لم يتم تقديم محتوى الرسالة')
                                     ->formatStateUsing(fn ($state) => $state ? nl2br(e($state)) : null)
                                     ->html()
                                     ->extraAttributes([
@@ -64,28 +64,28 @@ trait HasContactInfolist
                     ])
                     ->collapsible(),
 
-                Section::make(__('Message Metadata'))
-                    ->description(__('Additional information about this contact message'))
+                Section::make('بيانات الرسالة')
+                    ->description('معلومات إضافية عن رسالة الاتصال هذه')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
                         Grid::make(3)
                             ->schema([
                                 TextEntry::make('type')
-                                    ->label(__('Message Type'))
-                                    ->formatStateUsing(fn ($state) => $state == 0 ? __('Suggestion') : __('Problem'))
+                                    ->label('نوع الرسالة')
+                                    ->formatStateUsing(fn ($state) => $state == 0 ? 'اقتراح' : 'مشكلة')
                                     ->color(fn ($state) => $state == 0 ? 'success' : 'danger')
                                     ->icon(fn ($state) => $state == 0 ? 'heroicon-o-light-bulb' : 'heroicon-o-exclamation-triangle')
                                     ->iconPosition(IconPosition::Before),
 
                                 TextEntry::make('created_at')
-                                    ->label(__('Received At'))
+                                    ->label('تاريخ الاستلام')
                                     ->dateTime('F j, Y \a\t g:i A')
                                     ->icon('heroicon-o-clock')
                                     ->iconPosition(IconPosition::Before)
                                     ->color('gray'),
 
                                 TextEntry::make('updated_at')
-                                    ->label(__('Last Updated'))
+                                    ->label('آخر تحديث')
                                     ->dateTime('F j, Y \a\t g:i A')
                                     ->icon('heroicon-o-pencil')
                                     ->iconPosition(IconPosition::Before)

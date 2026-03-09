@@ -1,20 +1,20 @@
 @php
     use App\Support\DashboardDateFilter;
-    $currency = __('SAR');
+    $currency = 'ريال';
     $formatAmount = fn($amount) => number_format($amount, 2);
     $periodLabel = DashboardDateFilter::hasActiveFilter()
-        ? __('stats.revenue_in_period', ['amount' => $formatAmount($totalRevenue)])
-        : __('stats.revenue_all_time', ['amount' => $formatAmount($totalRevenue)]);
+        ? str_replace(':amount', $formatAmount($totalRevenue), ':amount ريال في الفترة المحددة')
+        : str_replace(':amount', $formatAmount($totalRevenue), ':amount ريال إجمالي');
     $items = [
-        ['label' => __('stats.revenue_company_profit'), 'value' => $companyProfit, 'icon' => 'heroicon-m-building-office-2', 'iconBg' => 'bg-primary-100 dark:bg-primary-900/30', 'iconColor' => 'text-primary-600 dark:text-primary-400'],
-        ['label' => __('stats.revenue_tax'), 'value' => $tax, 'icon' => 'heroicon-m-calculator', 'iconBg' => 'bg-amber-100 dark:bg-amber-900/30', 'iconColor' => 'text-amber-600 dark:text-amber-400'],
-        ['label' => __('stats.revenue_driver_profit'), 'value' => $driverProfit, 'icon' => 'heroicon-m-truck', 'iconBg' => 'bg-sky-100 dark:bg-sky-900/30', 'iconColor' => 'text-sky-600 dark:text-sky-400'],
+        ['label' => 'أرباح الشركة', 'value' => $companyProfit, 'icon' => 'heroicon-m-building-office-2', 'iconBg' => 'bg-primary-100 dark:bg-primary-900/30', 'iconColor' => 'text-primary-600 dark:text-primary-400'],
+        ['label' => 'الضريبة', 'value' => $tax, 'icon' => 'heroicon-m-calculator', 'iconBg' => 'bg-amber-100 dark:bg-amber-900/30', 'iconColor' => 'text-amber-600 dark:text-amber-400'],
+        ['label' => 'أرباح السائقين', 'value' => $driverProfit, 'icon' => 'heroicon-m-truck', 'iconBg' => 'bg-sky-100 dark:bg-sky-900/30', 'iconColor' => 'text-sky-600 dark:text-sky-400'],
     ];
 @endphp
 
 <x-filament-widgets::widget>
     <x-filament::section
-        :heading="__('stats.wallet_revenue')"
+        heading="إيراد إلى المحفظة"
         :description="$periodLabel"
         icon="heroicon-m-currency-dollar"
         iconColor="success"
@@ -51,7 +51,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-semibold text-success-700 dark:text-success-400">
-                                {{ __('stats.revenue_total') }}
+                                إجمالي الإيراد
                             </p>
                             <p class="text-3xl font-bold tabular-nums text-success-800 dark:text-success-300 sm:text-4xl">
                                 {{ $formatAmount($totalRevenue) }} {{ $currency }}

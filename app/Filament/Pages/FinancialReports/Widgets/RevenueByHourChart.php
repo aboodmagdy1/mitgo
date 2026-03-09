@@ -29,7 +29,7 @@ class RevenueByHourChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_revenue_by_hour');
+        return 'الإيرادات حسب ساعة اليوم';
     }
 
     protected function getOptions(): array
@@ -43,7 +43,7 @@ class RevenueByHourChart extends ApexChartWidget
                 'toolbar' => ['show' => false],
             ],
             'series' => [
-                ['name' => __('financial.revenue'), 'data' => $data['data']],
+                ['name' => 'الإيرادات', 'data' => $data['data']],
             ],
             'xaxis'       => ['categories' => $data['labels']],
             'colors'      => ['#06b6d4'],

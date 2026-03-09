@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\TripStatus;
 use Bavix\Wallet\Traits\HasWallet;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -124,6 +125,11 @@ class User extends Model implements FilamentUser, HasMedia, Authenticatable, Aut
     public function givenRatings()
     {
         return $this->hasMany(TripRating::class);
+    }
+
+    public function cashbackUsages(): HasMany
+    {
+        return $this->hasMany(CashbackUsage::class);
     }
 
     /**

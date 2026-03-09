@@ -20,16 +20,16 @@ class ViewDriverWithdrawRequest extends ViewRecord
     {
         return $infolist
             ->schema([
-                Section::make(__('wallet.driver_wallet_information'))
+                Section::make('معلومات محفظة السائق')
                     ->schema([
                         TextEntry::make('driver.user.name')
-                            ->label(__('wallet.driver_name'))
+                            ->label('اسم السائق')
                             ->weight('bold')
                             ->color('primary'),
                         TextEntry::make('driver.user.phone')
-                            ->label(__('wallet.driver_phone')),
+                            ->label('هاتف السائق'),
                         TextEntry::make('current_balance')
-                            ->label(__('wallet.current_balance'))
+                            ->label('الرصيد الحالي')
                             ->state(function (DriverWithdrawRequest $record): string {
                                 $balance = $record->driver->user->balance / 100 ?? 0;
                                 return number_format($balance,2) . ' SAR';
@@ -39,26 +39,26 @@ class ViewDriverWithdrawRequest extends ViewRecord
                     ])
                     ->columns(3),
                 
-                Section::make(__('wallet.withdraw_request_information'))
+                Section::make('معلومات طلب السحب')
                     ->schema([
                         TextEntry::make('amount')
-                            ->label(__('wallet.requested_amount'))
+                            ->label('المبلغ المطلوب')
                             ->weight('bold')
                             ->state(function (DriverWithdrawRequest $record): string {
                                 return $record->amount . ' SAR';
                             })
                             ->color('warning'),
                         TextEntry::make('is_approved')
-                            ->label(__('wallet.approval_status'))
+                            ->label('حالة الموافقة')
                             ->badge()
-                            ->formatStateUsing(fn (bool $state): string => $state ? __('wallet.completed') : __('wallet.pending'))
+                            ->formatStateUsing(fn (bool $state): string => $state ? 'مكتمل' : 'قيد الانتظار')
                             ->color(fn (bool $state): string => $state ? 'success' : 'warning'),
                         TextEntry::make('created_at')
-                            ->label(__('wallet.request_date'))
+                            ->label('تاريخ الطلب')
                             ->dateTime(),
                         TextEntry::make('notes')
-                            ->label(__('wallet.notes'))
-                            ->placeholder(__('wallet.no_notes_available'))
+                            ->label('الملاحظات')
+                            ->placeholder('لا توجد ملاحظات متاحة')
                             ->columnSpanFull(),
                     ])
                     ->columns(3),
@@ -69,14 +69,14 @@ class ViewDriverWithdrawRequest extends ViewRecord
     {
         return [
             Actions\Action::make('mark_completed')
-                ->label(__('wallet.mark_as_completed'))
+                ->label('تحديد كمكتمل')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
                 ->visible(fn (DriverWithdrawRequest $record): bool => !$record->is_approved)
                 ->form([
                     Forms\Components\Textarea::make('completion_notes')
-                        ->label(__('wallet.completion_notes'))
-                        ->placeholder(__('wallet.completion_notes_placeholder'))
+                    ->label('ملاحظات الإكمال')
+                            ->placeholder('أضف ملاحظات الإكمال...')
                         ->rows(3),
                 ])
                 ->action(function (DriverWithdrawRequest $record, array $data): void {
@@ -84,19 +84,19 @@ class ViewDriverWithdrawRequest extends ViewRecord
                     $record->update([
                         'is_approved' => true,
                         'notes' => ($record->notes ? $record->notes . "\n\n" : '') . 
-                                  __('wallet.admin_notes') . ": " . ($data['completion_notes'] ?? __('wallet.no_additional_notes')),
+                                  'ملاحظات الإدارة: ' . ($data['completion_notes'] ?? 'لا توجد ملاحظات إضافية'),
                     ]);
 
                     Notification::make()
-                        ->title(__('wallet.request_marked_completed'))
-                        ->body(__('wallet.withdrawal_request_completed'))
+                        ->title('تم تحديد الطلب كمكتمل')
+                        ->body('تم إكمال طلب السحب بنجاح')
                         ->success()
                         ->send();
                 })
                 ->requiresConfirmation()
-                ->modalHeading(__('wallet.mark_as_completed'))
-                ->modalDescription(__('wallet.mark_completed_description'))
-                ->modalSubmitActionLabel(__('wallet.mark_as_completed')),
+                ->modalHeading('تحديد كمكتمل')
+                ->modalDescription('تحديد طلب السحب هذا كمكتمل. هذا للحفظ والتوثيق فقط.')
+                ->modalSubmitActionLabel('تحديد كمكتمل'),
             //    Actions\EditAction::make(),
         ];
     }

@@ -21,22 +21,22 @@ use Filament\Tables\Table;
 
     public static function getNavigationLabel(): string
     {
-        return __('Cancel Trip Reasons');
+        return 'أسباب إلغاء الرحلة';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Cancel Trip Reason');
+        return 'سبب إلغاء الرحلة';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Cancel Trip Reasons');
+        return 'أسباب إلغاء الرحلة';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __("Informative Content");
+        return "المحتوى المعلومي";
     }
 
     public static function form(Form $form): Form
@@ -44,14 +44,13 @@ use Filament\Tables\Table;
         return $form
             ->schema([
                 Forms\Components\TextInput::make('reason')
-                    ->label(__('Reason'))
+                    ->label('السبب')
                     ->required()
-                    ->translateLabel()
                     ->maxLength(255)
                     ->columnSpanFull(),
 
                 Forms\Components\Select::make('type')
-                    ->label(__('Type'))
+                    ->label('النوع')
                     ->options([
                         CancelTripReasonType::Rider->value => CancelTripReasonType::Rider->label(),
                         CancelTripReasonType::Driver->value => CancelTripReasonType::Driver->label(),
@@ -60,7 +59,7 @@ use Filament\Tables\Table;
                     ->native(false),
 
                 Forms\Components\Toggle::make('is_active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->default(true)
                     ->columnSpanFull(),
             ]);
@@ -71,17 +70,16 @@ use Filament\Tables\Table;
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label(__('ID'))
+                    ->label('الرقم')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('reason')
-                    ->label(__('Reason'))
-                    ->translateLabel()
+                    ->label('السبب')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('type')
-                    ->label(__('Type'))
+                    ->label('النوع')
                     ->formatStateUsing(fn (CancelTripReasonType $state): string => $state->label())
                     ->badge()
                     ->color(fn (CancelTripReasonType $state): string => match ($state) {
@@ -91,25 +89,25 @@ use Filament\Tables\Table;
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('Updated At'))
+                    ->label('تاريخ التحديث')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
-                    ->label(__('Type'))
+                    ->label('النوع')
                     ->options([
                         CancelTripReasonType::Rider->value => CancelTripReasonType::Rider->label(),
                         CancelTripReasonType::Driver->value => CancelTripReasonType::Driver->label(),
@@ -117,24 +115,24 @@ use Filament\Tables\Table;
                     ->native(false),
                 
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
-                    ->trueLabel(__('Active only'))
-                    ->falseLabel(__('Inactive only'))
+                    ->trueLabel('النشط فقط')
+                    ->falseLabel('غير النشط فقط')
                     ->native(false),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('toggle_active')
-                    ->label(fn ($record) => $record->is_active ? __('Deactivate') : __('Activate'))
+                    ->label(fn ($record) => $record->is_active ? 'إلغاء التفعيل' : 'تفعيل')
                     ->icon(fn ($record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                     ->color(fn ($record) => $record->is_active ? 'danger' : 'success')
                     ->action(function ($record) {
                         $record->update(['is_active' => !$record->is_active]);
                         
                         $message = $record->is_active 
-                            ? __('Cancel reason activated successfully')
-                            : __('Cancel reason deactivated successfully');
+                            ? 'تم تفعيل سبب الإلغاء بنجاح'
+                            : 'تم إلغاء تفعيل سبب الإلغاء بنجاح';
                             
                         \Filament\Notifications\Notification::make()
                             ->title($message)
@@ -142,11 +140,11 @@ use Filament\Tables\Table;
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(fn ($record) => $record->is_active ? __('Deactivate Cancel Reason') : __('Activate Cancel Reason'))
+                    ->modalHeading(fn ($record) => $record->is_active ? 'إلغاء التفعيل لسبب الإلغاء' : 'تفعيل سبب الإلغاء')
                     ->modalDescription(fn ($record) => $record->is_active 
-                        ? __('Are you sure you want to deactivate this cancel reason?')
-                        : __('Are you sure you want to activate this cancel reason?'))
-                    ->modalSubmitActionLabel(fn ($record) => $record->is_active ? __('Deactivate') : __('Activate')),
+                        ? 'هل أنت متأكد من أنك تريد إلغاء تفعيل هذا السبب؟'
+                        : 'هل أنت متأكد من أنك تريد تفعيل هذا السبب؟')
+                    ->modalSubmitActionLabel(fn ($record) => $record->is_active ? 'إلغاء التفعيل' : 'تفعيل'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

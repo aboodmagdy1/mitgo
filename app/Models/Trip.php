@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOne as HasOneRelation;
 use App\Enums\TripStatus;
 use App\Enums\TripType;
 use App\Enums\TripPaymentType;
@@ -138,6 +139,11 @@ class Trip extends Model
     public function couponUsages(): HasMany
     {
         return $this->hasMany(CouponUsage::class);
+    }
+
+    public function cashbackUsage(): HasOneRelation
+    {
+        return $this->hasOne(CashbackUsage::class);
     }
 
     public function scopeActive(Builder $query)

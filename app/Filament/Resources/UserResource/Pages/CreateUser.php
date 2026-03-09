@@ -16,11 +16,11 @@ class CreateUser extends CreateRecord
 
     public function getTitle(): string
     {
-        return __("Create User");
+        return 'إنشاء مستخدم';
     }
     public function getBreadcrumb(): string
     {
-        return __("Create User");
+        return 'إنشاء مستخدم';
     }
     // assign role to user after create
     protected function afterCreate(): void

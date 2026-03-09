@@ -32,35 +32,33 @@ class UserResource extends Resource
     {        return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Name')
+                    ->label('الاسم')
                     ->required()
-                    ->translateLabel()
                     ->maxLength(255),
               
                 Forms\Components\TextInput::make('email')
-                    ->translateLabel()
+                    ->label('البريد الإلكتروني')
                     ->email()
                     ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('phone')
-                    ->translateLabel()
+                    ->label('رقم الهاتف')
                     ->tel()
                     ->unique(ignoreRecord: true)
                     ->required()
                     ->maxLength(255),
                 // select role 
                 Forms\Components\Select::make('role_id')
-                    ->label(__('Role'))
-                    ->translateLabel()
+                    ->label('الدور')
                     ->options(Role::whereNotIn('name',['client','driver'])->pluck('name', 'id'))
                     ->required()
                     ->dehydrated(false), // Don't save this field directly to the model
                     //fill with current password if editing
                 Forms\Components\TextInput::make('password')
+                    ->label('كلمة المرور')
                     ->password()
                     ->required()
-                    ->translateLabel()
                     ->maxLength(255)
                     ->visibleOn('create')
                     ,
@@ -75,9 +73,9 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->translateLabel(),
-                TextColumn::make('email')->translateLabel(),
-                TextColumn::make('roles.name')->badge()->translateLabel(),
+                TextColumn::make('name')->label('الاسم'),
+                TextColumn::make('email')->label('البريد الإلكتروني'),
+                TextColumn::make('roles.name')->label('الأدوار')->badge(),
 
             ])
             ->filters([
@@ -114,30 +112,28 @@ class UserResource extends Resource
 
     public static function getPluralLabel(): ?string
     {
-        return __("Admins");
+        return "المدراء";
     }
     
     public static function getLabel(): ?string
     {
-        return __("Admin");
+        return "مدير";
     }
     public static function getNavigationGroup(): ?string
     {
-        return __('Users');
+        return 'المستخدمين';
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                Section::make(__('Personal Information'))
-                    ->translateLabel()
+                Section::make('المعلومات الشخصية')
                     ->icon('heroicon-o-user')
                     ->collapsible()
                     ->schema([
                         ImageEntry::make('avatar_url')
-                            ->label('Avatar')
-                            ->translateLabel()
+                            ->label('الصورة الشخصية')
                             ->height(120)
                             ->width(120)
                             ->circular()
@@ -148,32 +144,28 @@ class UserResource extends Resource
                             ->schema([
                                 
                                 TextEntry::make('name')
-                                    ->label('Name')
-                                    ->translateLabel()
+                                    ->label('الاسم')
                                     ->icon('heroicon-o-user')
                                     ->size('lg')
                                     ->weight('bold')
                                     ->color('primary'),
                                 TextEntry::make('email')
-                                    ->label('Email')
-                                    ->translateLabel()
+                                    ->label('البريد الإلكتروني')
                                     ->icon('heroicon-o-envelope')
                                     ->copyable()
-                                    ->copyMessage('Email copied!')
+                                    ->copyMessage('تم نسخ البريد الإلكتروني!')
                                     ->color('gray'),
                             ])
                             ->columnSpan(2),
                     ])
                     ->columns(3),
 
-                Section::make(__('Access & Permissions'))
-                    ->translateLabel()
+                Section::make('الوصول والصلاحيات')
                     ->icon('heroicon-o-shield-check')
                     ->collapsible()
                     ->schema([
                         TextEntry::make('roles.name')
-                            ->translateLabel()
-                            ->label('Roles')
+                            ->label('الأدوار')
                             ->badge()
                             ->color('success')
                             ->icon('heroicon-o-key')
@@ -181,8 +173,7 @@ class UserResource extends Resource
                             ->columnSpanFull(),
                         
                         TextEntry::make('created_at')
-                            ->translateLabel()
-                            ->label('Member Since')
+                            ->label('عضو منذ')
                             ->icon('heroicon-o-calendar')
                             ->dateTime('F j, Y')
                             ->color('gray'),
@@ -190,8 +181,7 @@ class UserResource extends Resource
                     ])
                     ->columns(2),
 
-                Section::make(__('Account Statistics'))
-                    ->translateLabel()
+                Section::make('إحصائيات الحساب')
                     ->icon('heroicon-o-chart-bar')
                     ->collapsible()
                     ->collapsed()
@@ -199,21 +189,18 @@ class UserResource extends Resource
                         \Filament\Infolists\Components\Grid::make(3)
                             ->schema([
                                 TextEntry::make('updated_at')
-                                    ->translateLabel()
-                                    ->label('Last Updated')
+                                    ->label('آخر تحديث')
                                     ->icon('heroicon-o-clock')
                                     ->since()
                                     ->color('gray'),
                                 
                                 TextEntry::make('id')
-                                    ->translateLabel()
-                                    ->label('User ID')
+                                    ->label('معرف المستخدم')
                                     ->icon('heroicon-o-hashtag')
                                     ->color('gray'),
                                 
                                 TextEntry::make('roles')
-                                    ->translateLabel()
-                                    ->label('Total Roles')
+                                    ->label('إجمالي الأدوار')
                                     ->icon('heroicon-o-users')
                                     ->formatStateUsing(fn ($record) => $record->roles->count())
                                     ->color('primary'),

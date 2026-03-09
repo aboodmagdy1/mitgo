@@ -34,11 +34,15 @@ class TransactionResrouce extends JsonResource
             }
            
         }
+
         if(isset($this->meta['type']) && $this->meta['type'] == 'app_commission'){
             $data['type'] = 'app_commission';
             $data['description'] = __('App commission for trip #:number', ['number' => $this->meta['trip_id']]);
         }
-        else{
+        elseif(isset($this->meta['type']) && $this->meta['type'] == 'cashback'){
+            $data['type'] = 'cashback';
+            $data['description'] = __('Cashback for trip #:number', ['number' => $this->meta['trip_id'] ?? $this->id]);
+        } else{
             $data['type'] = $this->type;
         }
         return $data;

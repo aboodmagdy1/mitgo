@@ -77,11 +77,11 @@ class CityResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Locations');
+        return 'المواقع';
     }
 
     public static function getPluralLabel(): ?string
     {
-        return __('Cities');
+        return 'المدن';
     }
 }

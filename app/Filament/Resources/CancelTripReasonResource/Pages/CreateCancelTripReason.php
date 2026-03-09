@@ -13,7 +13,7 @@ class CreateCancelTripReason extends CreateRecord
 
     public function getTitle(): string
     {
-        return __('Create Cancel Trip Reason');
+        return 'إنشاء سبب إلغاء الرحلة';
     }
 
     protected function getHeaderActions(): array

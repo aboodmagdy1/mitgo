@@ -20,6 +20,6 @@ class CreateCity extends CreateRecord
 
     public function getTitle(): string
     {
-        return __('Add City');
+        return 'إضافة مدينة';
     }
 }

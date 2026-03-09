@@ -19,8 +19,6 @@ use Illuminate\Contracts\View\View;
 
 class FinancialReports extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-
     protected static ?int $navigationSort = 4;
 
     protected static string $view = 'filament.pages.financial-reports';
@@ -64,17 +62,17 @@ class FinancialReports extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Finance');
+        return 'المالية';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('financial.nav_label');
+        return 'التقارير المالية';
     }
 
     public function getTitle(): string
     {
-        return __('financial.page_title');
+        return 'التقارير المالية';
     }
 
     protected function getHeaderWidgets(): array

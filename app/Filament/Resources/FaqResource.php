@@ -25,36 +25,35 @@ class FaqResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('FAQs');
+        return 'الأسئلة الشائعة';
     }
 
     public static function getModelLabel(): string
     {
-        return __('FAQ');
+        return 'سؤال شائع';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('FAQs');
+        return 'الأسئلة الشائعة';
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('FAQ Information'))
+                Forms\Components\Section::make('معلومات السؤال الشائع')
                     ->schema([
                         Forms\Components\TextInput::make('title')
-                            ->label(__('Title'))
+                            ->label('العنوان')
                             ->required()
                             ->maxLength(255)
-                            ->translateLabel()
                             ->rules([
                                 function () {
                                     return function (string $attribute, $value, \Closure $fail) {
                                         if (is_array($value)) {
                                             if (empty($value['en']) && empty($value['ar'])) {
-                                                $fail(__('Title is required in at least one language'));
+                                                $fail('العنوان مطلوب بلغة واحدة على الأقل');
                                             }
                                         }
                                     };
@@ -62,15 +61,14 @@ class FaqResource extends Resource
                             ]),
                         
                         Forms\Components\RichEditor::make('description')
-                            ->label(__('Description'))
+                            ->label('الوصف')
                             ->required()
-                            ->translateLabel()
                             ->rules([
                                 function () {
                                     return function (string $attribute, $value, \Closure $fail) {
                                         if (is_array($value)) {
                                             if (empty($value['en']) && empty($value['ar'])) {
-                                                $fail(__('Description is required in at least one language'));
+                                                $fail('الوصف مطلوب بلغة واحدة على الأقل');
                                             }
                                         }
                                     };
@@ -87,17 +85,17 @@ class FaqResource extends Resource
                     ])
                     ->columns(1),
                 
-                Forms\Components\Section::make(__('Settings'))
+                Forms\Components\Section::make('الإعدادات')
                     ->schema([
                         Forms\Components\Toggle::make('active')
-                            ->label(__('Active'))
+                            ->label('نشط')
                             ->default(true),
                         
                         Forms\Components\TextInput::make('sort_order')
-                            ->label(__('Sort Order'))
+                            ->label('ترتيب العرض')
                             ->numeric()
                             ->default(0)
-                            ->helperText(__('Lower numbers appear first')),
+                            ->helperText('الأرقام الأقل تظهر أولاً'),
                     ])
                     ->columns(2),
             ]);
@@ -108,50 +106,50 @@ class FaqResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label(__('Title'))
+                    ->label('العنوان')
                     ->searchable()
                     ->sortable(),
                 
                 Tables\Columns\IconColumn::make('active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
                     ->sortable(),
                 
                 Tables\Columns\TextColumn::make('sort_order')
-                    ->label(__('Sort Order'))
+                    ->label('ترتيب العرض')
                     ->sortable()
                     ->alignCenter(),
                 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label(__('Updated At'))
+                    ->label('تاريخ التحديث')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
-                    ->trueLabel(__('Active only'))
-                    ->falseLabel(__('Inactive only'))
+                    ->trueLabel('النشط فقط')
+                    ->falseLabel('غير النشط فقط')
                     ->native(false),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->label(__('Edit')),
+                    ->label('تعديل'),
                 Tables\Actions\DeleteAction::make()
-                    ->label(__('Delete')),
+                    ->label('حذف'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->label(__('Delete Selected')),
+                        ->label('حذف المحدد'),
                 ]),
             ])
             ->defaultSort('sort_order');
@@ -175,7 +173,7 @@ class FaqResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __("Informative Content");
+        return "المحتوى المعلومي";
     }
 
     public static function getTranslatableLocales(): array
@@ -191,10 +189,10 @@ class FaqResource extends Resource
                 'array',
                 function ($attribute, $value, $fail) {
                     if (!isset($value['en']) || empty(trim($value['en']))) {
-                        $fail(__('Title is required in English'));
+                        $fail('العنوان مطلوب بالإنجليزية');
                     }
                     if (!isset($value['ar']) || empty(trim($value['ar']))) {
-                        $fail(__('Title is required in Arabic'));
+                        $fail('العنوان مطلوب بالعربية');
                     }
                 },
             ],
@@ -203,10 +201,10 @@ class FaqResource extends Resource
                 'array',
                 function ($attribute, $value, $fail) {
                     if (!isset($value['en']) || empty(trim($value['en']))) {
-                        $fail(__('Description is required in English'));
+                        $fail('الوصف مطلوب بالإنجليزية');
                     }
                     if (!isset($value['ar']) || empty(trim($value['ar']))) {
-                        $fail(__('Description is required in Arabic'));
+                        $fail('الوصف مطلوب بالعربية');
                     }
                 },
             ],

@@ -10,6 +10,8 @@ use Filament\Notifications\Livewire\DatabaseNotifications;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use App\Models\Trip;
+use App\Observers\TripObserver;
 use App\Events\TripCancelled;
 use App\Events\TripCompleted;
 use App\Events\TripCreated;
@@ -60,7 +62,8 @@ class AppServiceProvider extends ServiceProvider
         });
         DatabaseNotifications::trigger('vendor.filament.notifications.database-notifications-trigger');
         
-        // Register Banner Observer
+        // Register Trip observer for side effects on status changes
+        Trip::observe(TripObserver::class);
 
         // Register trip events
         Event::listen(TripCreated::class, InitiateDriverSearch::class);

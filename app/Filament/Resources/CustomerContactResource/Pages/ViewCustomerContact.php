@@ -16,24 +16,24 @@ class ViewCustomerContact extends ViewRecord
 
     public function getTitle(): string
     {
-        return __('Contact Message Details');
+        return 'تفاصيل رسالة الاتصال';
     }
 
     public function getHeading(): string
     {
-        return __('Contact from :name', ['name' => $this->record->name]);
+        return 'رسالة من ' . $this->record->name;
     }
 
     public function getSubheading(): string
     {
-        return __('Received on :date', ['date' => $this->record->created_at->format('F j, Y \a\t g:i A')]);
+        return 'تم الاستلام في ' . $this->record->created_at->format('F j, Y \a\t g:i A');
     }
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\Action::make('is_read')
-                ->label(__('Mark As Closed'))
+                ->label('تعليم كمغلق')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
                 ->visible(fn ($record) => $record->is_read == false)
@@ -41,17 +41,17 @@ class ViewCustomerContact extends ViewRecord
                     $this->record->update(['is_read' => true]);
                     $this->record->save();
                     \Filament\Notifications\Notification::make()
-                        ->title(__('Contact marked as closed'))
+                        ->title('تم تعليم رسالة الاتصال كمغلق')
                         ->success()
                         ->send();
                 }),
 
             Actions\DeleteAction::make()
                 ->requiresConfirmation()
-                ->modalHeading(__('Delete Contact Message'))
-                ->modalDescription(__('Are you sure you want to delete this contact message? This action cannot be undone.'))
-                ->modalSubmitActionLabel(__('Delete'))
-                ->modalCancelActionLabel(__('Cancel')),
+                ->modalHeading('حذف رسالة الاتصال')
+                ->modalDescription('هل أنت متأكد من حذف رسالة الاتصال هذه؟ لا يمكن التراجع عن هذا الإجراء.')
+                ->modalSubmitActionLabel('حذف')
+                ->modalCancelActionLabel('إلغاء'),
         ];
     }
 

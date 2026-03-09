@@ -52,14 +52,14 @@ class ViewZone extends ViewRecord
     {
         return [
             Actions\Action::make('filter_dates')
-                ->label(__('Filter by Date'))
+                ->label('فلتر حسب التاريخ')
                 ->icon('heroicon-o-calendar')
                 ->form([
                     DatePicker::make('dateFrom')
-                        ->label(__('From'))
+                        ->label('من')
                         ->native(false),
                     DatePicker::make('dateTo')
-                        ->label(__('To'))
+                        ->label('إلى')
                         ->native(false),
                 ])
                 ->fillForm(fn (): array => [
@@ -72,7 +72,7 @@ class ViewZone extends ViewRecord
                     $this->loadZoneStats();
                 }),
             Actions\Action::make('clear_date_filter')
-                ->label(__('All Time'))
+                ->label('الكل')
                 ->icon('heroicon-o-x-circle')
                 ->color('gray')
                 ->visible(fn (): bool => $this->dateFrom !== null || $this->dateTo !== null)
@@ -81,7 +81,7 @@ class ViewZone extends ViewRecord
                     $this->dateTo = null;
                     $this->loadZoneStats();
                 }),
-            Actions\EditAction::make()->label(__('Edit')),
+            Actions\EditAction::make()->label('تعديل'),
         ];
     }
 
@@ -90,20 +90,20 @@ class ViewZone extends ViewRecord
         return $infolist
             ->columns(1)
             ->schema([
-                Section::make(__('Details'))
+                Section::make('التفاصيل')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
                         TextEntry::make('name')
-                            ->label(__('Name'))
+                            ->label('الاسم')
                             ->icon('heroicon-o-tag'),
                         TextEntry::make('status')
-                            ->label(__('Active'))
+                            ->label('نشط')
                             ->badge()
-                            ->formatStateUsing(fn (?bool $state): string => $state ? __('Active') : __('Inactive'))
+                            ->formatStateUsing(fn (?bool $state): string => $state ? 'نشط' : 'غير نشط')
                             ->color(fn (?bool $state): string => $state ? 'success' : 'danger'),
                     ])->columns(2),
 
-                Section::make(__('Zone Polygon'))
+                Section::make('مضلع المنطقة')
                     ->icon('heroicon-o-map')
                     ->schema([
                         ViewEntry::make('zone_map')
@@ -112,7 +112,7 @@ class ViewZone extends ViewRecord
                             ->columnSpanFull(),
                     ]),
 
-                Section::make(__('Statistics'))
+                Section::make('الإحصائيات')
                     ->icon('heroicon-o-chart-bar')
                     ->description($this->getStatisticsDescription())
                     ->schema([
@@ -128,12 +128,9 @@ class ViewZone extends ViewRecord
     protected function getStatisticsDescription(): ?string
     {
         if ($this->dateFrom && $this->dateTo) {
-            return __('Showing trips from :from to :to', [
-                'from' => Carbon::parse($this->dateFrom)->format('Y-m-d'),
-                'to' => Carbon::parse($this->dateTo)->format('Y-m-d'),
-            ]);
+            return 'عرض الرحلات من ' . Carbon::parse($this->dateFrom)->format('Y-m-d') . ' إلى ' . Carbon::parse($this->dateTo)->format('Y-m-d');
         }
 
-        return __('All time');
+        return 'الكل';
     }
 }

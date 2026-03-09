@@ -26,39 +26,24 @@ enum TripStatus: int
 
     public function label(?string $locale = null): string
     {
-        $currentLocale = app()->getLocale();
-        $targetLocale = $locale ?? $currentLocale;
-        
-        // Set locale temporarily if different from current
-        if ($targetLocale !== $currentLocale) {
-            app()->setLocale($targetLocale);
-        }
-        
-        $label = match($this) {
-            self::SEARCHING => __('Searching'),
-            self::RIDER_NO_SHOW => __('Rider No Show'),
-            self::NO_DRIVER_FOUND => __('No Driver Found'),
-            self::IN_ROUTE_TO_PICKUP => __('In Route to Pickup'),
-            self::PICKUP_ARRIVED => __('Pickup Arrived'),
-            self::RIDER_NOT_FOUND => __('Rider Not Found'),
-            self::IN_PROGRESS => __('In Progress'),
-            self::COMPLETED_PENDING_PAYMENT => __('Completed Pending Payment'),
-            self::PAYMENT_FAILED => __('Payment Failed'),
-            self::PAID => __('Paid'),
-            self::CANCELLED_BY_DRIVER => __('Cancelled by Driver'),
-            self::CANCELLED_BY_RIDER => __('Cancelled by Rider'),
-            self::CANCELLED_BY_SYSTEM => __('Cancelled by System'),
-            self::TRIP_EXPIRED => __('Trip Expired'),
-            self::SCHEDULED => __('Scheduled'),
-            self::COMPLETED => __('Completed'),
+        return match($this) {
+            self::SEARCHING => 'البحث',
+            self::RIDER_NO_SHOW => 'عدم حضور الراكب',
+            self::NO_DRIVER_FOUND => 'لم يتم العثور على سائق',
+            self::IN_ROUTE_TO_PICKUP => 'في الطريق لنقطة الانطلاق',
+            self::PICKUP_ARRIVED => 'وصل إلى نقطة الانطلاق',
+            self::RIDER_NOT_FOUND => 'لم يتم العثور على الراكب',
+            self::IN_PROGRESS => 'قيد التنفيذ',
+            self::COMPLETED_PENDING_PAYMENT => 'مكتمل في انتظار الدفع',
+            self::PAYMENT_FAILED => 'فشل الدفع',
+            self::PAID => 'مدفوع',
+            self::CANCELLED_BY_DRIVER => 'ملغي من قبل السائق',
+            self::CANCELLED_BY_RIDER => 'ملغي من قبل الراكب',
+            self::CANCELLED_BY_SYSTEM => 'ملغي من قبل النظام',
+            self::TRIP_EXPIRED => 'انتهت صلاحية الرحلة',
+            self::SCHEDULED => 'مجدولة',
+            self::COMPLETED => 'مكتملة',
         };
-        
-        // Reset locale if it was changed
-        if ($targetLocale !== $currentLocale) {
-            app()->setLocale($currentLocale);
-        }
-        
-        return $label;
     }
 
     public static function getValues(){
@@ -67,7 +52,7 @@ enum TripStatus: int
             return (object) [
                 'id' => $status->value,
                 'name' => in_array($status, [self::CANCELLED_BY_DRIVER, self::CANCELLED_BY_RIDER, self::CANCELLED_BY_SYSTEM], true)
-                    ? __('Cancelled')
+                    ? 'ملغية'
                     : $status->label(),
             ];
         }, self::cases());

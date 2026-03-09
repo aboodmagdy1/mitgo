@@ -29,7 +29,7 @@ class CouponImpactChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_coupon_impact');
+        return 'استخدام الكوبونات وتأثيرها';
     }
 
     protected function getOptions(): array
@@ -39,8 +39,8 @@ class CouponImpactChart extends ApexChartWidget
         if (empty($data['labels'])) {
             return [
                 'chart'  => ['type' => 'bar', 'height' => 300],
-                'series' => [['name' => __('financial.discount'), 'data' => [0]]],
-                'xaxis'  => ['categories' => [__('financial.no_coupon_data')]],
+                'series' => [['name' => 'إجمالي الخصم', 'data' => [0]]],
+                'xaxis'  => ['categories' => ['لا يوجد استخدام للكوبونات في هذه الفترة']],
                 'colors' => ['#f59e0b'],
                 'dataLabels' => ['enabled' => false],
             ];
@@ -53,8 +53,8 @@ class CouponImpactChart extends ApexChartWidget
                 'toolbar' => ['show' => false],
             ],
             'series' => [
-                ['name' => __('financial.discount'), 'data' => $data['discounts']],
-                ['name' => __('financial.uses'),     'data' => $data['counts']],
+                ['name' => 'إجمالي الخصم', 'data' => $data['discounts']],
+                ['name' => 'مرات الاستخدام',     'data' => $data['counts']],
             ],
             'xaxis'       => ['categories' => $data['labels']],
             'colors'      => ['#f59e0b', '#8b5cf6'],

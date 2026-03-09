@@ -30,14 +30,14 @@ abstract class ContactResourceBase extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('Name'))
+                    ->label('الاسم')
                     ->searchable()
                     ->sortable()
                     ->weight('medium')
                     ->icon('heroicon-o-user'),
 
                 Tables\Columns\TextColumn::make('email')
-                    ->label(__('Email'))
+                    ->label('البريد الإلكتروني')
                     ->searchable()
                     ->sortable()
                     ->icon('heroicon-o-envelope')
@@ -45,23 +45,23 @@ abstract class ContactResourceBase extends Resource
                     ->copyable(),
 
                 Tables\Columns\TextColumn::make('type')
-                    ->label(__('Type'))
+                    ->label('النوع')
                     ->sortable()
-                    ->formatStateUsing(fn ($state) => $state == 0 ? __('Suggestions') : __('Problem'))
+                    ->formatStateUsing(fn ($state) => $state == 0 ? 'اقتراحات' : 'مشكلة')
                     ->icon(fn ($state) => $state == 0 ? 'heroicon-o-light-bulb' : 'heroicon-o-exclamation-triangle')
                     ->color('info'),
                     // 0: suggestions , 1: problem 
 
                     // 1 open , 0 closed
                     Tables\Columns\TextColumn::make('is_read')
-                    ->label(__('Open'))
+                    ->label('مفتوح')
                     ->sortable()
                     ->icon(fn($record) => $record->is_read == 0 ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                     ->color(fn($record) => $record->is_read == 0 ?  'danger' : 'success' )
-                    ->formatStateUsing(fn($state) => $state == 0 ? __('Open') : __('Closed')),
+                    ->formatStateUsing(fn($state) => $state == 0 ? 'مفتوح' : 'مغلق'),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Received At'))
+                    ->label('تاريخ الاستلام')
                     ->dateTime('M j, Y H:i')
                     ->sortable()
                     ->icon('heroicon-o-clock')
@@ -72,14 +72,14 @@ abstract class ContactResourceBase extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->label(__('View Details'))
+                    ->label('عرض التفاصيل')
                     ->icon('heroicon-o-eye'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->requiresConfirmation()
-                        ->label(__('Delete Selected')),
+                        ->label('حذف المحدد'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
@@ -102,7 +102,7 @@ abstract class ContactResourceBase extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Customer Service Department');
+        return 'قسم خدمة العملاء';
     }
 
     public static function getNavigationBadge(): ?string

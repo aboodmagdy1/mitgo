@@ -22,21 +22,21 @@ class ZoneResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Zones');
+        return 'المناطق';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Zone');
+        return 'المنطقة';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Zones');
+        return 'المناطق';
     }
     public static function getNavigationGroup(): ?string
     {
-        return __('Locations');
+        return 'المواقع';
     }
 
     public static function form(Form $form): Form
@@ -45,23 +45,23 @@ class ZoneResource extends Resource
 
         return $form
             ->schema([
-                Forms\Components\Section::make(__('Details'))
+                Forms\Components\Section::make('التفاصيل')
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label(__('Name'))
+                            ->label('الاسم')
                             ->required()
                             ->translateLabel(),
                         Forms\Components\Toggle::make('status')
-                            ->label(__('Active'))
+                            ->label('نشط')
                             ->default(true),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('Map'))
+                Forms\Components\Section::make('الخريطة')
                     ->schema([
                         Map::make('points')
-                        ->label(__('Polygon'))
+                        ->label('المضلع')
                         ->required()
-                        ->helperText(__('Draw exactly one polygon.'))
+                        ->helperText('ارسم مضلعاً واحداً بالضبط.')
                         ->rules([new SinglePolygonRule()])
                         ->columnSpanFull()
                         ->zoom(8)
@@ -96,26 +96,26 @@ class ZoneResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('Name'))
+                    ->label('الاسم')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('status')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label(__('View')),
-                Tables\Actions\EditAction::make()->label(__('Edit')),
-                Tables\Actions\DeleteAction::make()->label(__('Delete')),
+                Tables\Actions\ViewAction::make()->label('عرض'),
+                Tables\Actions\EditAction::make()->label('تعديل'),
+                Tables\Actions\DeleteAction::make()->label('حذف'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label(__('Delete Selected')),
+                    Tables\Actions\DeleteBulkAction::make()->label('حذف المحدد'),
                 ]),
             ]);
     }

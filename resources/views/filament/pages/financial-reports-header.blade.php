@@ -9,7 +9,7 @@
             class="flex flex-wrap items-center gap-2"
         >
             <label class="shrink-0 text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ __('financial.date_range') }}:
+                {{ 'نطاق التاريخ' }}:
             </label>
 
             <div class="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50/80 px-3 py-2 dark:border-gray-700 dark:bg-gray-800/50">
@@ -30,8 +30,8 @@
                     wire:loading.attr="disabled"
                     class="rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-primary-500 disabled:opacity-60 dark:bg-primary-500 dark:hover:bg-primary-400"
                 >
-                    <span wire:loading.remove wire:target="applyDateFilter">{{ __('financial.apply_filter') }}</span>
-                    <span wire:loading wire:target="applyDateFilter">{{ __('financial.loading') }}</span>
+                    <span wire:loading.remove wire:target="applyDateFilter">{{ 'تطبيق' }}</span>
+                    <span wire:loading wire:target="applyDateFilter">{{ 'جارٍ التحميل...' }}</span>
                 </button>
             </div>
         </div>

@@ -20,13 +20,11 @@ use Illuminate\Database\Eloquent\Builder;
 class DriverWithdrawRequestResource extends Resource
 {
     protected static ?string $model = DriverWithdrawRequest::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
     protected static ?int $navigationSort = 3;
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Finance');
+        return 'المالية';
     }
 
     public static function form(Form $form): Form
@@ -34,23 +32,23 @@ class DriverWithdrawRequestResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('driver_id')
-                    ->label(__('Driver'))
+                    ->label('السائق')
                     ->relationship('driver.user', 'name')
                     ->required()
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('amount')
-                    ->label(__('Amount'))
+                    ->label('المبلغ')
                     ->numeric()
                     ->required()
                     ->step(0.01)
                     ->minValue(0.01)
                     ->prefix('SAR'),
                 Forms\Components\Toggle::make('is_approved')
-                    ->label(__('Approved'))
+                    ->label('موافق عليه')
                     ->default(false),
                 Forms\Components\Textarea::make('notes')
-                    ->label(__('Notes'))
+                    ->label('الملاحظات')
                     ->rows(3)
                     ->columnSpanFull(),
             ]);
@@ -62,7 +60,7 @@ class DriverWithdrawRequestResource extends Resource
             ->recordUrl(null)
             ->columns([
                 TextColumn::make('driver.user.name')
-                    ->label(__('Driver Name'))
+                    ->label('اسم السائق')
                     ->searchable()
                     ->sortable()
                     ->url(fn (DriverWithdrawRequest $record): string => 
@@ -71,21 +69,21 @@ class DriverWithdrawRequestResource extends Resource
                     ->color('primary')
                     ->weight('medium'),
                 TextColumn::make('driver.user.phone')
-                    ->label(__('Driver Phone'))
+                    ->label('هاتف السائق')
                     ->searchable(),
                 TextColumn::make('amount')
-                    ->label(__('Amount'))
+                    ->label('المبلغ')
                     ->money('SAR')
                     ->sortable(),
                 BadgeColumn::make('is_approved')
-                    ->label(__('Status'))
-                    ->formatStateUsing(fn (bool $state): string => $state ? __('wallet.completed') : __('wallet.pending'))
+                    ->label('الحالة')
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'مكتمل' : 'قيد الانتظار')
                     ->colors([
                         'warning' => false,
                         'success' => true,
                     ]),
                 TextColumn::make('notes')
-                    ->label(__('Notes'))
+                    ->label('الملاحظات')
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
@@ -95,28 +93,28 @@ class DriverWithdrawRequestResource extends Resource
                         return $state;
                     }),
                 TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('is_approved')
-                    ->label(__('Status'))
+                    ->label('الحالة')
                     ->options([
-                        0 => __('wallet.pending'),
-                        1 => __('wallet.completed'),
+                        0 => 'قيد الانتظار',
+                        1 => 'مكتمل',
                     ]),
             ])
             ->actions([
                 Action::make('mark_completed')
-                    ->label(__('wallet.mark_as_completed'))
+                    ->label('تحديد كمكتمل')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn (DriverWithdrawRequest $record): bool => !$record->is_approved)
                     ->form([
                         Forms\Components\Textarea::make('completion_notes')
-                            ->label(__('wallet.completion_notes'))
-                            ->placeholder(__('Add any notes about completing this request...'))
+                            ->label('ملاحظات الإكمال')
+                            ->placeholder('أضف أي ملاحظات حول إكمال هذا الطلب...')
                             ->rows(3),
                     ])
                     ->action(function (DriverWithdrawRequest $record, array $data): void {
@@ -124,19 +122,19 @@ class DriverWithdrawRequestResource extends Resource
                         $record->update([
                             'is_approved' => true,
                             'notes' => ($record->notes ? $record->notes . "\n\n" : '') . 
-                                      __('wallet.admin_notes') . ": " . ($data['completion_notes'] ?? __('No additional notes')),
+                                      'ملاحظات الإدارة: ' . ($data['completion_notes'] ?? 'لا توجد ملاحظات إضافية'),
                         ]);
 
                         Notification::make()
-                            ->title(__('wallet.request_marked_completed'))
-                            ->body(__('wallet.withdrawal_request_completed'))
+                            ->title('تم تحديد الطلب كمكتمل')
+                            ->body('تم إكمال طلب السحب بنجاح')
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(__('wallet.mark_as_completed'))
-                    ->modalDescription(__('Mark this withdrawal request as completed. This is for record keeping only.'))
-                    ->modalSubmitActionLabel(__('wallet.mark_as_completed')),
+                    ->modalHeading('تحديد كمكتمل')
+                    ->modalDescription('تحديد طلب السحب هذا كمكتمل. هذا للحفظ والتوثيق فقط.')
+                    ->modalSubmitActionLabel('تحديد كمكتمل'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -158,12 +156,12 @@ class DriverWithdrawRequestResource extends Resource
 
     public static function getLabel(): string
     {
-        return __('Withdraw Request');
+        return 'طلب السحب';
     }
 
     public static function getPluralLabel(): string
     {
-        return __('Withdraw Requests');
+        return 'طلبات السحب';
     }
 
     public static function getNavigationBadge(): ?string

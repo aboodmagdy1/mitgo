@@ -30,53 +30,46 @@ class ZonePricingTable extends BaseTableWidget
             ->query($this->getTableQuery())
             ->columns([
                 TextColumn::make('zone.name')
-                    ->label(__('Zone'))
-                    ->translateLabel()
+                    ->label('المنطقة')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
 
                 TextColumn::make('base_fare')
-                    ->label(__('Base Fare'))
-                    ->translateLabel()
+                    ->label('الأجرة الأساسية')
                     ->money('SAR')
                     ->sortable(),
 
                 TextColumn::make('fare_per_km')
-                    ->label(__('Fare per KM'))
-                    ->translateLabel()
+                    ->label('الأجرة لكل كيلومتر')
                     ->money('SAR')
                     ->sortable(),
 
                 TextColumn::make('fare_per_minute')
-                    ->label(__('Fare per Minute'))
-                    ->translateLabel()
+                    ->label('الأجرة لكل دقيقة')
                     ->money('SAR')
                     ->sortable(),
 
                 TextColumn::make('cancellation_fee')
-                    ->label(__('Cancellation Fee'))
-                    ->translateLabel()
+                    ->label('رسوم الإلغاء')
                     ->money('SAR')
                     ->sortable(),
 
                 TextColumn::make('waiting_fee')
-                    ->label(__('Waiting Fee'))
-                    ->translateLabel()
+                    ->label('رسوم الانتظار')
                     ->money('SAR')
                     ->sortable(),
 
                 TextColumn::make('extra_fare')
-                    ->label(__('Extra Fare'))
-                    ->translateLabel()
+                    ->label('أجرة إضافية')
                     ->money('SAR')
                     ->sortable(),
             ])
             ->striped()
-            ->heading(__('Vehicle Type Pricing'))
-            ->description(__('Pricing by Zone'))
-            ->emptyStateHeading(__('No pricing available'))
-            ->emptyStateDescription(__('Please create pricing first'))
+            ->heading('تسعير نوع المركبة')
+            ->description('التسعير حسب المنطقة')
+            ->emptyStateHeading('لا توجد تسعيرات متاحة')
+            ->emptyStateDescription('يرجى إنشاء التسعير أولاً')
             ->paginated(false);
     }
 

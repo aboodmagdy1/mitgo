@@ -568,6 +568,7 @@ class TripService extends BaseService
 
             $trip->update($updateData);
             Log::info('endTrip', ['trip' => $trip]);
+
             // Create payment record with pending status
             $payment = TripPayment::create([
                 'trip_id' => $trip->id,
@@ -582,6 +583,7 @@ class TripService extends BaseService
                 'coupon_id' => $trip->coupon_id,
             ]);
             Log::info('endTrip', ['payment' => $payment]);
+
             // Reload relationships
             $trip->load(['payment', 'driver.user', 'driver.vehicle', 'user', 'vehicleType', 'paymentMethod', 'coupon']);
             Log::info('endTrip', ['trip' => $trip]);
@@ -600,7 +602,7 @@ class TripService extends BaseService
     {
         return DB::transaction(function () use ($trip, $transactionId) {
             // Load payment relationship
-            $trip->load(['payment', 'driver.user']);
+            $trip->load(['payment', 'driver.user', 'user']);
             
             if (!$trip->payment) {
                 throw new \Exception(__('Payment record not found for this trip'));
@@ -626,7 +628,7 @@ class TripService extends BaseService
                 'trip_id' => $trip->id,
                 'description' => __('Trip earning for trip #:number', ['number' => $trip->number]),
             ]);
-            
+
             // Reload relationships
             $trip->load(['payment', 'driver.user', 'driver.vehicle', 'user', 'vehicleType', 'paymentMethod', 'coupon']);
 
@@ -641,7 +643,7 @@ class TripService extends BaseService
     {
         return DB::transaction(function () use ($trip) {
             // Load payment relationship
-            $trip->load(['payment', 'driver.user']);
+            $trip->load(['payment', 'driver.user', 'user']);
             
             if (!$trip->payment) {
                 throw new \Exception(__('Payment record not found for this trip'));

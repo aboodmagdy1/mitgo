@@ -22,7 +22,7 @@ class VehicleBrandResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Vehicle Management');
+        return 'إدارة المركبات';
     }
 
     public static function form(Form $form): Form
@@ -30,17 +30,14 @@ class VehicleBrandResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label(__('Brand Name'))
-                    ->translateLabel()
+                    ->label('اسم الماركة')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Toggle::make('active')
-                    ->label(__('Active'))
-                    ->translateLabel()
+                    ->label('نشط')
                     ->default(true),
                 SpatieMediaLibraryFileUpload::make('icon')
-                    ->label(__('Icon'))
-                    ->translateLabel()
+                    ->label('الأيقونة')
                     ->collection('icon')
                     ->image(),          
             ]);
@@ -51,30 +48,25 @@ class VehicleBrandResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label(__('Brand Name'))
-                    ->translateLabel()
+                    ->label('اسم الماركة')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('active')
-                    ->label(__('Active'))
-                    ->translateLabel()
+                    ->label('نشط')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('models_count')
-                    ->label(__('Models Count'))
-                    ->translateLabel()
+                    ->label('عدد الموديلات')
                     ->counts('models')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('Created At'))
-                    ->translateLabel()
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('active')
-                    ->label(__('Active'))
-                    ->translateLabel(),
+                    ->label('نشط'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -105,16 +97,16 @@ class VehicleBrandResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Vehicle Brands');
+        return 'ماركات المركبات';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Vehicle Brands');
+        return 'ماركات المركبات';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Vehicle Brand');
+        return 'ماركة المركبة';
     }
 }

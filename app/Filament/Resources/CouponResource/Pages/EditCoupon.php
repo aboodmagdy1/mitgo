@@ -19,7 +19,7 @@ class EditCoupon extends EditRecord
 
     public function getTitle(): string
     {
-        return __('Edit Coupon');
+        return 'تعديل الكوبون';
     }
 }
 

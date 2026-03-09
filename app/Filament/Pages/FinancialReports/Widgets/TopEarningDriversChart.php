@@ -29,7 +29,7 @@ class TopEarningDriversChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_top_drivers');
+        return 'أعلى 10 سائقين أرباحاً';
     }
 
     protected function getOptions(): array
@@ -43,7 +43,7 @@ class TopEarningDriversChart extends ApexChartWidget
                 'toolbar' => ['show' => false],
             ],
             'series' => [
-                ['name' => __('financial.earnings'), 'data' => $data['data']],
+                ['name' => 'الأرباح', 'data' => $data['data']],
             ],
             'xaxis'       => ['categories' => $data['labels']],
             'colors'      => ['#10b981'],

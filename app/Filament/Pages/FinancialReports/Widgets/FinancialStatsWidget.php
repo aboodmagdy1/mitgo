@@ -35,68 +35,68 @@ class FinancialStatsWidget extends BaseWidget
         $data  = app(FinancialReportService::class)->getStatCards($range);
 
         return [
-            Stat::make(__('financial.total_revenue'), $this->formatMoney($data['total_revenue']))
-                ->description(__('financial.completed_payments'))
+            Stat::make('إجمالي الإيرادات', $this->formatMoney($data['total_revenue']))
+                ->description('من المدفوعات المكتملة')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
                 ->icon('heroicon-m-currency-dollar'),
 
-            Stat::make(__('financial.company_profit'), $this->formatMoney($data['company_profit']))
-                ->description(__('financial.commission_earned'))
+            Stat::make('أرباح الشركة', $this->formatMoney($data['company_profit']))
+                ->description('عمولة المنصة')
                 ->descriptionIcon('heroicon-m-building-office')
                 ->color('primary')
                 ->icon('heroicon-m-building-office'),
 
-            Stat::make(__('financial.driver_earnings'), $this->formatMoney($data['driver_earnings']))
-                ->description(__('financial.net_driver_payout'))
+            Stat::make('أرباح السائقين', $this->formatMoney($data['driver_earnings']))
+                ->description('صافي مدفوعات السائق')
                 ->descriptionIcon('heroicon-m-truck')
                 ->color('info')
                 ->icon('heroicon-m-truck'),
 
-            Stat::make(__('financial.avg_trip_fare'), $this->formatMoney($data['avg_trip_fare']))
-                ->description(__('financial.per_completed_trip'))
+            Stat::make('متوسط تكلفة الرحلة', $this->formatMoney($data['avg_trip_fare']))
+                ->description('لكل رحلة مكتملة')
                 ->descriptionIcon('heroicon-m-calculator')
                 ->color('warning')
                 ->icon('heroicon-m-calculator'),
 
-            Stat::make(__('financial.total_taxes'), $this->formatMoney($data['total_taxes']))
-                ->description(__('financial.tax_rate_label', ['rate' => '15%']))
+            Stat::make('إجمالي الضرائب (15%)', $this->formatMoney($data['total_taxes']))
+                ->description('15% من إجمالي الإيرادات')
                 ->descriptionIcon('heroicon-m-receipt-percent')
                 ->color('gray')
                 ->icon('heroicon-m-receipt-percent'),
 
-            Stat::make(__('financial.coupon_discounts'), $this->formatMoney($data['coupon_discounts']))
-                ->description(__('financial.total_discounts_given'))
+            Stat::make('خصومات الكوبونات', $this->formatMoney($data['coupon_discounts']))
+                ->description('إجمالي الخصومات الممنوحة')
                 ->descriptionIcon('heroicon-m-tag')
                 ->color('warning')
                 ->icon('heroicon-m-tag'),
 
-            Stat::make(__('financial.cancellation_fees'), $this->formatMoney($data['cancellation_fees']))
-                ->description(__('financial.fees_collected'))
+            Stat::make('رسوم الإلغاء', $this->formatMoney($data['cancellation_fees']))
+                ->description('رسوم محصّلة')
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger')
                 ->icon('heroicon-m-x-circle'),
 
-            Stat::make(__('financial.waiting_fees'), $this->formatMoney($data['waiting_fees']))
-                ->description(__('financial.fees_collected'))
+            Stat::make('رسوم الانتظار', $this->formatMoney($data['waiting_fees']))
+                ->description('رسوم محصّلة')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning')
                 ->icon('heroicon-m-clock'),
 
-            Stat::make(__('financial.pending_payments'), number_format($data['pending_count']))
-                ->description(__('financial.pending_amount_label', ['amount' => $this->formatMoney($data['pending_amount'])]))
+            Stat::make('المدفوعات المعلقة', number_format($data['pending_count']))
+                ->description($this->formatMoney($data['pending_amount']) . ' معلق')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('warning')
                 ->icon('heroicon-m-exclamation-triangle'),
 
-            Stat::make(__('financial.refunded_amount'), $this->formatMoney($data['refunded_amount']))
-                ->description(__('financial.total_refunds'))
+            Stat::make('المبالغ المستردة', $this->formatMoney($data['refunded_amount']))
+                ->description('إجمالي الاسترداد المعالج')
                 ->descriptionIcon('heroicon-m-arrow-uturn-left')
                 ->color('danger')
                 ->icon('heroicon-m-arrow-uturn-left'),
 
-            Stat::make(__('financial.wallet_balance'), $this->formatMoney($data['wallet_balance']))
-                ->description(__('financial.all_user_wallets'))
+            Stat::make('أرصدة المحافظ', $this->formatMoney($data['wallet_balance']))
+                ->description('محافظ جميع المستخدمين والسائقين')
                 ->descriptionIcon('heroicon-m-wallet')
                 ->color('info')
                 ->icon('heroicon-m-wallet'),

@@ -29,7 +29,7 @@ class PaymentMethodsChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_payment_methods');
+        return 'توزيع طرق الدفع';
     }
 
     protected function getOptions(): array

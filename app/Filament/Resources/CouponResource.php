@@ -18,24 +18,24 @@ class CouponResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Marketing');
+        return 'التسويق';
     }
 
     public static function getPluralLabel(): ?string
     {
-        return __('Coupons');
+        return 'الكوبونات';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Coupon');
+        return 'الكوبون';
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('معلومات الكوبون الأساسية'))
+                Forms\Components\Section::make('معلومات الكوبون الأساسية')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('اسم الكوبون'))
@@ -43,14 +43,14 @@ class CouponResource extends Resource
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('code')
-                            ->label(__('كود الكوبون'))
+                            ->label('كود الكوبون')
                             ->required()
                             ->maxLength(50)
                             ->unique(ignoreRecord: true)
                             ->helperText('كود فريد للكوبون'),
 
                         Forms\Components\Select::make('type')
-                            ->label(__('نوع الكوبون'))
+                            ->label('نوع الكوبون')
                             ->options([
                                 1 => 'نسبة مئوية (%)',
                                 2 => 'مبلغ ثابت (ريال)',
@@ -68,7 +68,7 @@ class CouponResource extends Resource
                             ->maxValue(fn (callable $get) => $get('type') == 1 ? 100 : null),
 
                         Forms\Components\TextInput::make('max_discount_amount')
-                            ->label(__('الحد الأقصى للخصم (ريال)'))
+                            ->label('الحد الأقصى للخصم (ريال)')
                             ->numeric()
                             ->minValue(0)
                             ->suffix('ريال')
@@ -77,39 +77,39 @@ class CouponResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make(__('صلاحية الكوبون'))
+                Forms\Components\Section::make('صلاحية الكوبون')
                     ->schema([
                         Forms\Components\DatePicker::make('start_date')
-                            ->label(__('تاريخ البداية'))
+                            ->label('تاريخ البداية')
                             ->helperText('اختياري - اتركه فارغ للبدء الفوري'),
 
                         Forms\Components\DatePicker::make('end_date')
-                            ->label(__('تاريخ النهاية'))
+                            ->label('تاريخ النهاية')
                             ->helperText('اختياري - اتركه فارغ للكوبون مفتوح')
                             ->after('start_date'),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make(__('حدود الاستخدام'))
+                Forms\Components\Section::make('حدود الاستخدام')
                     ->schema([
                         Forms\Components\TextInput::make('total_usage_limit')
-                            ->label(__('عدد مرات الاستخدام الكلي'))
+                            ->label('عدد مرات الاستخدام الكلي')
                             ->numeric()
                             ->minValue(1)
                             ->helperText('اختياري - اتركه فارغ للاستخدام المفتوح'),
 
                         Forms\Components\TextInput::make('usage_limit_per_user')
-                            ->label(__('عدد مرات الاستخدام لكل مستخدم'))
+                            ->label('عدد مرات الاستخدام لكل مستخدم')
                             ->numeric()
                             ->minValue(1)
                             ->helperText('اختياري - اتركه فارغ للاستخدام المفتوح لكل مستخدم'),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make(__('الحالة'))
+                Forms\Components\Section::make('الحالة')
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
-                            ->label(__('مفعل'))
+                            ->label('مفعل')
                             ->default(true),
                     ])
                     ->columns(1),
@@ -126,7 +126,7 @@ class CouponResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('code')
-                    ->label(__('الكود'))
+                    ->label('الكود')
                     ->searchable()
                     ->sortable()
                     ->copyable()
@@ -134,7 +134,7 @@ class CouponResource extends Resource
                     ->color('primary'),
 
                 Tables\Columns\TextColumn::make('type_name')
-                    ->label(__('النوع'))
+                    ->label('النوع')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'نسبة مئوية' => 'success',
@@ -143,7 +143,7 @@ class CouponResource extends Resource
                     }),
 
                 Tables\Columns\TextColumn::make('amount')
-                    ->label(__('القيمة'))
+                    ->label('القيمة')
                     ->sortable()
                     ->formatStateUsing(fn ($record) => 
                         $record->type == 1 
@@ -153,13 +153,13 @@ class CouponResource extends Resource
                     ->alignCenter(),
 
                 Tables\Columns\TextColumn::make('max_discount_amount')
-                    ->label(__('الحد الأقصى'))
+                    ->label('الحد الأقصى')
                     ->formatStateUsing(fn ($state) => $state ? $state . ' ريال' : '---')
                     ->alignCenter()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('used_count')
-                    ->label(__('مرات الاستخدام'))
+                    ->label('مرات الاستخدام')
                     ->formatStateUsing(fn ($record) => 
                         $record->total_usage_limit 
                             ? $record->used_count . '/' . $record->total_usage_limit
@@ -169,7 +169,7 @@ class CouponResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('remaining_usage')
-                    ->label(__('المتبقي'))
+                    ->label('المتبقي')
                     ->formatStateUsing(fn ($record) => 
                         $record->remaining_usage === null ? '∞' : $record->remaining_usage
                     )
@@ -181,49 +181,49 @@ class CouponResource extends Resource
                     ),
 
                 Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('مفعل'))
+                    ->label('مفعل')
                     ->boolean()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('start_date')
-                    ->label(__('تاريخ البداية'))
+                    ->label('تاريخ البداية')
                     ->date()
                     ->sortable()
                     ->placeholder('---')
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('end_date')
-                    ->label(__('تاريخ النهاية'))
+                    ->label('تاريخ النهاية')
                     ->date()
                     ->sortable()
                     ->placeholder('---')
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('تاريخ الإنشاء'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->boolean()
-                    ->trueLabel(__('Active only'))
-                    ->falseLabel(__('Inactive only'))
+                    ->trueLabel('المفعّلة فقط')
+                    ->falseLabel('غير المفعّلة فقط')
                     ->native(false),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
-                    ->label(__('عرض الاستخدام'))
+                    ->label('عرض الاستخدام')
                     ->icon('heroicon-o-eye')
                     ->url(fn ($record) => static::getUrl('usage', ['record' => $record])),
-                Tables\Actions\EditAction::make()->label(__('تعديل')),
-                Tables\Actions\DeleteAction::make()->label(__('حذف')),
+                Tables\Actions\EditAction::make()->label('تعديل'),
+                Tables\Actions\DeleteAction::make()->label('حذف'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label(__('Delete Selected')),
+                    Tables\Actions\DeleteBulkAction::make()->label('حذف المحدد'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

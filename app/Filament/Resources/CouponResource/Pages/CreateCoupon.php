@@ -11,7 +11,7 @@ class CreateCoupon extends CreateRecord
 
     public function getTitle(): string
     {
-        return __('Create Coupon');
+        return 'إنشاء كوبون';
     }
 }
 

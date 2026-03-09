@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Widgets\AdvancedDashboardStatsWidget;
+use Filament\Facades\Filament;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -28,6 +29,11 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        Filament::serving(function () {
+            app()->setLocale('ar');
+            session(['locale' => 'ar']);
+        });
+
         return $panel
             ->default()
             ->spa()
@@ -58,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                SetAdminLocale::class,
+                SetAdminLocale::class, // MUST run last to override filament-language-switch (which injects before DispatchServingFilamentEvent)
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -72,26 +78,26 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('Main Core')
+                    ->label('البنية الرئيسية')
                     ->collapsed(),
                 NavigationGroup::make()
-                    ->label('Drop Lists')
+                    ->label('القوائم المنسدلة')
                     ->collapsed(),
                 NavigationGroup::make()
-                    ->label('Finance')
+                    ->label('المالية')
                     ->icon('heroicon-o-banknotes')
                     ->collapsed(),
                 NavigationGroup::make()
-                    ->label('Users')
+                    ->label('المستخدمين')
                     ->collapsed(),
                 NavigationGroup::make()
-                    ->label('Roles')
+                    ->label('الأدوار')
                     ->collapsed(),
                 NavigationGroup::make()
-                    ->label('Access Management')
+                    ->label('إدارة الوصول')
                     ->collapsed(),
                 NavigationGroup::make()
-                    ->label('Settings')
+                    ->label('الإعدادات')
                     ->collapsed(),
             ])->databaseNotifications()
             ->viteTheme('resources/css/filament/admin/theme.css')

@@ -29,7 +29,7 @@ class CommissionVsDriverChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_commission_vs_driver');
+        return 'العمولة مقابل أرباح السائقين';
     }
 
     protected function getOptions(): array
@@ -44,8 +44,8 @@ class CommissionVsDriverChart extends ApexChartWidget
                 'toolbar' => ['show' => true],
             ],
             'series' => [
-                ['name' => __('financial.commission'),      'data' => $data['commission']],
-                ['name' => __('financial.driver_earnings'), 'data' => $data['driver_earnings']],
+                ['name' => 'العمولة',      'data' => $data['commission']],
+                ['name' => 'أرباح السائقين', 'data' => $data['driver_earnings']],
             ],
             'xaxis'       => ['categories' => $data['labels']],
             'colors'      => ['#3b82f6', '#10b981'],

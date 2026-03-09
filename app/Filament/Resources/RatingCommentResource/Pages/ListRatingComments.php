@@ -13,13 +13,13 @@ class ListRatingComments extends ListRecords
 
     public function getTitle(): string
     {
-        return __('Rating Comments');
+        return 'تعليقات التقييم';
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label(__('Create Rating Comment')),
+            Actions\CreateAction::make()->label('إنشاء تعليق تقييم'),
             Actions\LocaleSwitcher::make(),
         ];
     }

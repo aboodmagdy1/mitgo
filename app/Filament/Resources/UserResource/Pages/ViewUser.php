@@ -13,6 +13,6 @@ class ViewUser extends ViewRecord
 
     public function getTitle(): string
     {
-        return __('View User');
+        return 'عرض المستخدم';
     }
 }

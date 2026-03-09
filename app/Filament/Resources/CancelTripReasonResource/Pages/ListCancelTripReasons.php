@@ -13,18 +13,18 @@ class ListCancelTripReasons extends ListRecords
 
     public function getTitle(): string
     {
-        return __('Cancel Trip Reasons');
+        return 'أسباب إلغاء الرحلة';
     }
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->label(__('Create'))
-                ->modalHeading(__('Create Cancel Trip Reason'))
+                ->label('إنشاء')
+                ->modalHeading('إنشاء سبب إلغاء الرحلة')
                 ->modalWidth('md')
-                ->modalSubmitActionLabel(__('Create'))
-                ->modalCancelActionLabel(__('Cancel')),
+                ->modalSubmitActionLabel('إنشاء')
+                ->modalCancelActionLabel('إلغاء'),
             Actions\LocaleSwitcher::make(),
         ];
     }

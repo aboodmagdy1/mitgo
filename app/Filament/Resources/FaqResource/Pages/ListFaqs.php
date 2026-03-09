@@ -15,13 +15,13 @@ class ListFaqs extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label(__('Create FAQ')),
+                ->label('إنشاء سؤال شائع'),
             Actions\LocaleSwitcher::make(),
         ];
     }
 
     public function getTitle(): string
     {
-        return __('FAQs');
+        return 'الأسئلة الشائعة';
     }
 }

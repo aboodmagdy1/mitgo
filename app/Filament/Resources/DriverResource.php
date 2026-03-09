@@ -36,71 +36,71 @@ class DriverResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Users');
+        return 'المستخدمين';
     }
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make(__('User Information'))
+            Forms\Components\Section::make('معلومات المستخدم')
                 ->schema([
                     Forms\Components\TextInput::make('user.name')
-                        ->label(__('Name'))->required()->maxLength(255),
+                        ->label('الاسم')->required()->maxLength(255),
                     Forms\Components\TextInput::make('user.email')
-                        ->label(__('Email'))->email()->maxLength(255),
+                        ->label('البريد الإلكتروني')->email()->maxLength(255),
                     Forms\Components\TextInput::make('user.phone')
-                        ->label(__('Phone'))->tel()->required()->maxLength(255),
+                        ->label('رقم الهاتف')->tel()->required()->maxLength(255),
                     Forms\Components\Select::make('user.city_id')
-                        ->label(__('City'))->relationship('user.city', 'name')->required()->searchable()->preload(),
+                        ->label('المدينة')->relationship('user.city', 'name')->required()->searchable()->preload(),
                     Forms\Components\Toggle::make('user.is_active')
-                        ->label(__('Active'))->default(true),
+                        ->label('نشط')->default(true),
                 ])->columns(2),
 
-            Forms\Components\Section::make(__('Driver Information'))
+            Forms\Components\Section::make('معلومات السائق')
                 ->schema([
                     Forms\Components\DatePicker::make('date_of_birth')
-                        ->label(__('Date of Birth'))->required(),
+                        ->label('تاريخ الميلاد')->required(),
                     Forms\Components\TextInput::make('national_id')
-                        ->label(__('National ID'))->required()->maxLength(255),
+                        ->label('رقم الهوية الوطنية')->required()->maxLength(255),
                     Forms\Components\TextInput::make('absher_phone')
-                        ->label(__('Absher Phone'))->tel()->required()->maxLength(255),
+                        ->label('هاتف أبشر')->tel()->required()->maxLength(255),
                     Forms\Components\Select::make('status')
-                        ->label(__('Driver Status'))
-                        ->options([0 => __('Offline'), 1 => __('Online')])->default(0),
+                        ->label('حالة السائق')
+                        ->options([0 => 'غير متصل', 1 => 'متصل'])->default(0),
                     Forms\Components\Select::make('approval_status')
-                        ->label(__('Approval Status'))
+                        ->label('حالة الموافقة')
                         ->options([
-                            ApprovalStatus::PENDING->value     => __('Pending'),
-                            ApprovalStatus::IN_PROGRESS->value => __('In Progress'),
-                            ApprovalStatus::APPROVED->value    => __('Approved'),
-                            ApprovalStatus::REJECTED->value    => __('Rejected'),
+                            ApprovalStatus::PENDING->value     => 'قيد الانتظار',
+                            ApprovalStatus::IN_PROGRESS->value => 'قيد المعاينة',
+                            ApprovalStatus::APPROVED->value    => 'موافق عليه',
+                            ApprovalStatus::REJECTED->value    => 'مرفوض',
                         ])
                         ->default(ApprovalStatus::PENDING->value)
                         ->required(),
                 ])->columns(2),
 
-            Forms\Components\Section::make(__('Vehicle Information'))
+            Forms\Components\Section::make('معلومات المركبة')
                 ->schema([
                     Forms\Components\Select::make('vehicle.vehicle_type_id')
-                        ->label(__('Vehicle Type'))
+                        ->label('تصنيف المركبة')
                         ->options(VehicleType::where('active', true)->pluck('name', 'id'))
                         ->required()->reactive(),
                     Forms\Components\Select::make('vehicle.vehicle_brand_id')
-                        ->label(__('Vehicle Brand'))
+                        ->label('ماركة المركبة')
                         ->options(VehicleBrand::where('active', true)->pluck('name', 'id'))
                         ->required()->reactive()
                         ->afterStateUpdated(fn ($state, callable $set) => $set('vehicle.vehicle_brand_model_id', null)),
                     Forms\Components\Select::make('vehicle.vehicle_brand_model_id')
-                        ->label(__('Vehicle Model'))
+                        ->label('موديل المركبة')
                         ->options(function (callable $get) {
                             $vehicleBrandId = $get('vehicle.vehicle_brand_id');
                             if (! $vehicleBrandId) return [];
                             return VehicleBrandModel::where('vehicle_brand_id', $vehicleBrandId)
                                 ->where('active', true)->pluck('name', 'id');
                         })->required()->reactive()->searchable(),
-                    Forms\Components\TextInput::make('vehicle.color')->label(__('Vehicle Color'))->maxLength(255),
-                    Forms\Components\TextInput::make('vehicle.plate_number')->label(__('Plate Number'))->maxLength(255),
-                    Forms\Components\TextInput::make('vehicle.seats')->label(__('Number of Seats'))->numeric()->minValue(1)->maxValue(50),
+                    Forms\Components\TextInput::make('vehicle.color')->label('لون المركبة')->maxLength(255),
+                    Forms\Components\TextInput::make('vehicle.plate_number')->label('رقم اللوحة')->maxLength(255),
+                    Forms\Components\TextInput::make('vehicle.seats')->label('عدد المقاعد')->numeric()->minValue(1)->maxValue(50),
                 ])->columns(2),
         ]);
     }
@@ -109,14 +109,14 @@ class DriverResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')->label(__('Name'))->searchable()->sortable(),
-                TextColumn::make('user.phone')->label(__('Phone'))->searchable(),
-                TextColumn::make('user.email')->label(__('Email'))->searchable(),
-                TextColumn::make('user.city.name')->label(__('City'))->sortable(),
-                BooleanColumn::make('user.is_active')->label(__('Active'))
+                TextColumn::make('user.name')->label('الاسم')->searchable()->sortable(),
+                TextColumn::make('user.phone')->label('رقم الهاتف')->searchable(),
+                TextColumn::make('user.email')->label('البريد الإلكتروني')->searchable(),
+                TextColumn::make('user.city.name')->label('المدينة')->sortable(),
+                BooleanColumn::make('user.is_active')->label('نشط')
                     ->trueIcon('heroicon-o-check-badge')->falseIcon('heroicon-o-x-circle'),
                 BadgeColumn::make('approval_status')
-                    ->label(__('Approval Status'))
+                    ->label('حالة الموافقة')
                     ->formatStateUsing(fn ($state): string => BaseDriverResource::normalizeApprovalStatus($state)->label())
                     ->colors([
                         'warning' => fn ($state) => BaseDriverResource::normalizeApprovalStatus($state) === ApprovalStatus::PENDING,
@@ -125,22 +125,22 @@ class DriverResource extends Resource
                         'danger'  => fn ($state) => BaseDriverResource::normalizeApprovalStatus($state) === ApprovalStatus::REJECTED,
                     ]),
                 BadgeColumn::make('status')
-                    ->label(__('Driver Status'))
+                    ->label('حالة السائق')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        '0' => __('Offline'), '1' => __('Online'), default => __('Unknown'),
+                        '0' => 'غير متصل', '1' => 'متصل', default => 'غير معروف',
                     })
                     ->colors(['danger' => '0', 'success' => '1']),
-                TextColumn::make('created_at')->label(__('Created At'))->dateTime()->sortable()
+                TextColumn::make('created_at')->label('تاريخ الإنشاء')->dateTime()->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('approval_status')
-                    ->label(__('Approval Status'))
+                    ->label('حالة الموافقة')
                     ->options([
-                        ApprovalStatus::PENDING->value     => __('Pending'),
-                        ApprovalStatus::IN_PROGRESS->value => __('In Progress'),
-                        ApprovalStatus::APPROVED->value    => __('Approved'),
-                        ApprovalStatus::REJECTED->value    => __('Rejected'),
+                        ApprovalStatus::PENDING->value     => 'قيد الانتظار',
+                        ApprovalStatus::IN_PROGRESS->value => 'قيد المعاينة',
+                        ApprovalStatus::APPROVED->value    => 'موافق عليه',
+                        ApprovalStatus::REJECTED->value    => 'مرفوض',
                     ])
                     ->query(fn (Builder $query, array $data): Builder =>
                         $data['value'] !== null
@@ -148,7 +148,7 @@ class DriverResource extends Resource
                             : $query
                     ),
                 SelectFilter::make('city')
-                    ->label(__('City'))->relationship('user.city', 'name')->searchable(),
+                    ->label('المدينة')->relationship('user.city', 'name')->searchable(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -187,11 +187,11 @@ class DriverResource extends Resource
 
     public static function getLabel(): string
     {
-        return __('Driver');
+        return 'السائق';
     }
 
     public static function getPluralLabel(): string
     {
-        return __('Drivers');
+        return 'السائقين';
     }
 }

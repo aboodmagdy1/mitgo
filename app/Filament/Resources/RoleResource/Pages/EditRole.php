@@ -18,7 +18,7 @@ class EditRole extends EditRecord
     protected function getActions(): array
     {
         return [
-            Actions\DeleteAction::make()->modalHeading(__('Delete Role')),
+            Actions\DeleteAction::make()->modalHeading('حذف الدور'),
         ];
     }
 

@@ -2,7 +2,7 @@
 <html dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
-    <title>{{ __('financial.page_title') }}</title>
+    <title>{{ 'التقارير المالية' }}</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 11px; color: #1f2937; background: #fff; padding: 24px; }
@@ -18,26 +18,26 @@
     </style>
 </head>
 <body>
-    <h1>{{ __('financial.page_title') }}</h1>
+    <h1>{{ 'التقارير المالية' }}</h1>
     <p class="subtitle">
-        {{ __('financial.report_period') }}:
+        {{ 'الفترة' }}:
         {{ $dateFrom ?? '–' }} → {{ $dateTo ?? '–' }}
         &nbsp;|&nbsp;
-        {{ __('financial.generated_at') }}: {{ now()->format('Y-m-d H:i') }}
+        {{ 'تاريخ الإنشاء' }}: {{ now()->format('Y-m-d H:i') }}
     </p>
 
     <table>
         <thead>
             <tr>
-                <th>{{ __('financial.col_date') }}</th>
-                <th>{{ __('financial.col_total_trips') }}</th>
-                <th class="currency">{{ __('financial.col_total_revenue') }}</th>
-                <th class="currency">{{ __('financial.col_commission') }}</th>
-                <th class="currency">{{ __('financial.col_driver_earnings') }}</th>
-                <th class="currency">{{ __('financial.col_coupon_discounts') }}</th>
-                <th class="currency">{{ __('financial.col_cancellation_fees') }}</th>
-                <th class="currency">{{ __('financial.col_waiting_fees') }}</th>
-                <th class="currency">{{ __('financial.col_net_revenue') }}</th>
+                <th>{{ 'التاريخ' }}</th>
+                <th>{{ 'الرحلات' }}</th>
+                <th class="currency">{{ 'إجمالي الإيرادات' }}</th>
+                <th class="currency">{{ 'العمولة' }}</th>
+                <th class="currency">{{ 'أرباح السائقين' }}</th>
+                <th class="currency">{{ 'خصومات الكوبونات' }}</th>
+                <th class="currency">{{ 'رسوم الإلغاء' }}</th>
+                <th class="currency">{{ 'رسوم الانتظار' }}</th>
+                <th class="currency">{{ 'صافي الإيرادات' }}</th>
             </tr>
         </thead>
         <tbody>
@@ -56,7 +56,7 @@
             @empty
                 <tr>
                     <td colspan="9" style="text-align:center; padding:20px; color:#9ca3af;">
-                        {{ __('financial.no_data_for_period') }}
+                        {{ 'لا توجد بيانات للفترة المحددة' }}
                     </td>
                 </tr>
             @endforelse
@@ -64,7 +64,7 @@
         @if($rows->isNotEmpty())
         <tfoot>
             <tr>
-                <td>{{ __('financial.total') }}</td>
+                <td>{{ 'الإجمالي' }}</td>
                 <td>{{ number_format($rows->sum('total_trips')) }}</td>
                 <td class="currency">{{ number_format($rows->sum('total_revenue'), 2) }}</td>
                 <td class="currency">{{ number_format($rows->sum('commission'), 2) }}</td>
@@ -78,6 +78,6 @@
         @endif
     </table>
 
-    <p class="footer">{{ config('app.name') }} &mdash; {{ __('financial.page_title') }}</p>
+    <p class="footer">{{ config('app.name') }} &mdash; {{ 'التقارير المالية' }}</p>
 </body>
 </html>

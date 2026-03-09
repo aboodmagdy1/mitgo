@@ -29,7 +29,7 @@ class TripsVsRevenueChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_trips_vs_revenue');
+        return 'عدد الرحلات مقابل الإيرادات';
     }
 
     protected function getOptions(): array
@@ -43,8 +43,8 @@ class TripsVsRevenueChart extends ApexChartWidget
                 'toolbar' => ['show' => true],
             ],
             'series' => [
-                ['name' => __('financial.trips'),   'type' => 'column', 'data' => $data['trips']],
-                ['name' => __('financial.revenue'),  'type' => 'line',   'data' => $data['revenue']],
+                ['name' => 'الرحلات',   'type' => 'column', 'data' => $data['trips']],
+                ['name' => 'الإيرادات',  'type' => 'line',   'data' => $data['revenue']],
             ],
             'xaxis'       => ['categories' => $data['labels'], 'labels' => ['rotate' => -45]],
             'colors'      => ['#3b82f6', '#10b981'],

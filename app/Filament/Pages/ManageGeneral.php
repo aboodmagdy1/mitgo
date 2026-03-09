@@ -77,46 +77,44 @@ class ManageGeneral extends SettingsPage
                             ->live(),
                     ])
                     ->columns(2),
-                Section::make(__('Timers'))
+                Section::make('المؤقتات')
                     ->schema([
                         Forms\Components\TextInput::make('free_waiting_time')
                             ->label('وقت الانتظار المجاني')
-                            ->translateLabel()
                             ->suffix('دقيقة')
-                            ->helperText(__('the free time that dirver wait for the cleint'))
+                            ->helperText('الوقت المجاني الذي ينتظر السائق للعميل')
                             ->required(),
                     ])
                     ->icon('heroicon-o-clock')
                     ->columns(2),
-                Section::make(__('Commission'))
+                Section::make('العمولة')
                 ->schema([
                     Forms\Components\TextInput::make('commission_rate')
-                    ->label('Commission Rate')
-                    ->translateLabel()
+                    ->label('نسبة العمولة')
                     ->required(),
                 ])
                 ->icon('heroicon-o-currency-dollar')
                 ->columns(2),
                 Forms\Components\TextInput::make('emergency_phone')
-                ->label('Emergency Phone')
+                ->label('رقم الطوارئ')
                 ->translateLabel()
                 ->tel()
-                ->helperText(__('the emergency phone number that will be displayed in the app'))
+                ->helperText('رقم هاتف الطوارئ الذي سيتم عرضه في التطبيق')
                 ->required(),
             ]);
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Settings');
+        return 'الإعدادات';
     }
     public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable{
-        return __('Manage General');
+        return 'إدارة العام';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Manage General');
+        return 'إدارة العام';
     }
 
     private function buildSearchDescription(Get $get): string

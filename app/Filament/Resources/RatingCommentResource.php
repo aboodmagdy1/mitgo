@@ -28,32 +28,31 @@ class RatingCommentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __("Informative Content");
+        return "المحتوى المعلومي";
     }
     public static function getPluralModelLabel(): string
     {
-        return __('Rating Comments');
+        return 'تعليقات التقييم';
     }
    
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('Comment Information'))
+                Forms\Components\Section::make('معلومات التعليق')
                     ->schema([
                         Forms\Components\TextInput::make('comment')
-                            ->label(__('Comment'))
+                            ->label('التعليق')
                             ->required()
-                            ->translateLabel()
                             ->columnSpanFull(),
                         Forms\Components\Toggle::make('is_positive')
-                            ->label(__('Is Positive Comment'))
+                            ->label('تعليق إيجابي')
                             ->default(true)
-                            ->helperText(__('Mark as positive if this is a complimentary comment')),
+                            ->helperText('قم بوضع علامة كإيجابي إذا كان هذا تعليق مجامل'),
                         Forms\Components\Toggle::make('active')
-                            ->label(__('Active'))
+                            ->label('نشط')
                             ->default(true)
-                            ->helperText(__('Only active comments will be available for selection')),
+                            ->helperText('التعليقات النشطة فقط ستكون متاحة للاختيار'),
                     ]),
             ]);
     }
@@ -63,7 +62,7 @@ class RatingCommentResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('comment')
-                    ->label(__('Comment'))
+                    ->label('التعليق')
                     ->formatStateUsing(function (RatingComment $record) {
                         return $record->getCommentText(app()->getLocale());
                     })
@@ -76,13 +75,13 @@ class RatingCommentResource extends Resource
                         return $text;
                     }),
                 BooleanColumn::make('is_positive')
-                    ->label(__('Positive'))
+                    ->label('إيجابي')
                     ->trueIcon('heroicon-o-face-smile')
                     ->falseIcon('heroicon-o-face-frown')
                     ->trueColor('success')
                     ->falseColor('danger'),
                 BooleanColumn::make('active')
-                    ->label(__('Active'))
+                    ->label('نشط')
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle'),
                 
@@ -93,23 +92,23 @@ class RatingCommentResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('is_positive')
-                    ->label(__('Comment Type'))
+                    ->label('نوع التعليق')
                     ->options([
-                        1 => __('Positive'),
-                        0 => __('Negative'),
+                        1 => 'إيجابي',
+                        0 => 'سلبي',
                     ]),
                 SelectFilter::make('active')
-                    ->label(__('Status'))
+                    ->label('الحالة')
                     ->options([
-                        1 => __('Active'),
-                        0 => __('Inactive'),
+                        1 => 'نشط',
+                        0 => 'غير نشط',
                     ]),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('toggle_active')
-                    ->label(fn ($record) => $record->active ? __('Deactivate') : __('Activate'))
+                    ->label(fn ($record) => $record->active ? 'إلغاء التفعيل' : 'تفعيل')
                     ->icon(fn ($record) => $record->active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                     ->color(fn ($record) => $record->active ? 'danger' : 'success')
                     ->action(function ($record) {
@@ -128,25 +127,25 @@ class RatingCommentResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make(__('Comment Details'))
+                Section::make('تفاصيل التعليق')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->schema([
                         TextEntry::make('comment')
-                            ->label(__('Comment'))
+                            ->label('التعليق')
                             ->formatStateUsing(function (RatingComment $record) {
                                 return $record->getCommentText(app()->getLocale());
                             })
                             ->columnSpanFull(),
                         TextEntry::make('is_positive')
-                            ->label(__('Comment Type'))
+                            ->label('نوع التعليق')
                             ->badge()
-                            ->formatStateUsing(fn (bool $state): string => $state ? __('Positive') : __('Negative'))
+                            ->formatStateUsing(fn (bool $state): string => $state ? 'إيجابي' : 'سلبي')
                             ->color(fn (bool $state): string => $state ? 'success' : 'danger')
                             ->icon(fn (bool $state): string => $state ? 'heroicon-o-face-smile' : 'heroicon-o-face-frown'),
                         TextEntry::make('active')
-                            ->label(__('Status'))
+                            ->label('الحالة')
                             ->badge()
-                            ->formatStateUsing(fn (bool $state): string => $state ? __('Active') : __('Inactive'))
+                            ->formatStateUsing(fn (bool $state): string => $state ? 'نشط' : 'غير نشط')
                             ->color(fn (bool $state): string => $state ? 'success' : 'danger'),
                     ])->columns(2),
 
@@ -169,11 +168,11 @@ class RatingCommentResource extends Resource
 
     public static function getLabel(): string
     {
-        return __('Rating Comment');
+        return 'تعليق التقييم';
     }
 
     public static function getPluralLabel(): string
     {
-        return __('Rating Comments');
+        return 'تعليقات التقييم';
     }
 }

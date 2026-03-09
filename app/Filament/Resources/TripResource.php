@@ -27,14 +27,47 @@ class TripResource extends Resource
     protected static ?string $model = Trip::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map';
+
+    /** Arabic labels for enums (Filament admin only - enums stay unchanged for API). */
+    public static function tripStatusLabel(?TripStatus $status): string
+    {
+        return $status ? match ($status) {
+            TripStatus::SEARCHING => 'البحث',
+            TripStatus::RIDER_NO_SHOW => 'عدم حضور الراكب',
+            TripStatus::NO_DRIVER_FOUND => 'لم يتم العثور على سائق',
+            TripStatus::IN_ROUTE_TO_PICKUP => 'في الطريق لنقطة الانطلاق',
+            TripStatus::PICKUP_ARRIVED => 'وصل إلى نقطة الانطلاق',
+            TripStatus::RIDER_NOT_FOUND => 'لم يتم العثور على الراكب',
+            TripStatus::IN_PROGRESS => 'قيد التنفيذ',
+            TripStatus::COMPLETED_PENDING_PAYMENT => 'مكتمل في انتظار الدفع',
+            TripStatus::PAYMENT_FAILED => 'فشل الدفع',
+            TripStatus::PAID => 'مدفوع',
+            TripStatus::CANCELLED_BY_DRIVER => 'ملغي من قبل السائق',
+            TripStatus::CANCELLED_BY_RIDER => 'ملغي من قبل الراكب',
+            TripStatus::CANCELLED_BY_SYSTEM => 'ملغي من قبل النظام',
+            TripStatus::TRIP_EXPIRED => 'انتهت صلاحية الرحلة',
+            TripStatus::SCHEDULED => 'مجدولة',
+            TripStatus::COMPLETED => 'مكتملة',
+            default => 'غير معروف',
+        } : 'غير معروف';
+    }
+
+    public static function tripTypeLabel(?TripType $type): string
+    {
+        return $type ? match ($type) {
+            TripType::immediate => 'فوري',
+            TripType::scheduled => 'مجدولة',
+            default => 'غير معروف',
+        } : 'غير معروف';
+    }
     public static  function getNavigationGroup(): ?string
     {
-        return __('Trips Management');
+        return 'إدارة الرحلات';
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Trips');
+        return 'الرحلات';
     }
     protected static ?int $navigationSort = 1;
 
@@ -42,132 +75,132 @@ class TripResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make(__('Trip Information'))
+                Forms\Components\Section::make('معلومات الرحلة')
                     ->schema([
                         Forms\Components\Select::make('user_id')
-                            ->label(__('Rider'))
+                            ->label('الراكب')
                             ->relationship('user', 'name', fn($query) => $query->whereNotNull('name'))
                             ->searchable()
                             ->required(),
                         Forms\Components\Select::make('driver_id')
-                            ->label(__('Driver'))
+                            ->label('السائق')
                             ->relationship('driver.user', 'name', fn($query) => $query->whereNotNull('name'))
                             ->searchable()
                             ->nullable(),
                         Forms\Components\Select::make('zone_id')
-                            ->label(__('Zone'))
+                            ->label('المنطقة')
                             ->relationship('zone', 'name', fn($query) => $query->whereNotNull('name'))
                             ->searchable()
                             ->nullable(),
                         Forms\Components\Select::make('vehicle_type_id')
-                            ->label(__('Vehicle Type'))
+                            ->label('نوع المركبة')
                             ->relationship('vehicleType', 'name', fn($query) => $query->whereNotNull('name'))
                             ->searchable()
                             ->nullable(),
                         Forms\Components\Select::make('type')
-                            ->label(__('Trip Type'))
+                            ->label('نوع الرحلة')
                             ->options([
-                                TripType::immediate->value => TripType::immediate->label(),
-                                TripType::scheduled->value => TripType::scheduled->label(),
+                                TripType::immediate->value => static::tripTypeLabel(TripType::immediate),
+                                TripType::scheduled->value => static::tripTypeLabel(TripType::scheduled),
                             ])
                             ->default(TripType::immediate->value)
                             ->required(),
                         Forms\Components\Select::make('status')
-                            ->label(__('Status'))
+                            ->label('الحالة')
                             ->options(collect(TripStatus::cases())->mapWithKeys(fn($case) => [
-                                $case->value => $case->label()
+                                $case->value => static::tripStatusLabel($case)
                             ]))
                             ->default(TripStatus::SEARCHING->value)
                             ->required(),
                         Forms\Components\Select::make('payment_method_id')
-                            ->label(__('Payment Method'))
+                            ->label('طريقة الدفع')
                             ->relationship('paymentMethod', 'name', fn($query) => $query->whereNotNull('name'))
                             ->searchable()
                             ->required(),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('Pickup Information'))
+                Forms\Components\Section::make('معلومات نقطة الانطلاق')
                     ->schema([
                         Forms\Components\TextInput::make('pickup_lat')
-                            ->label(__('Pickup Latitude'))
+                            ->label('خط عرض نقطة الانطلاق')
                             ->numeric()
                             ->step(0.00000001)
                             ->rules(['nullable', 'numeric', 'between:-90,90']),
                         Forms\Components\TextInput::make('pickup_long')
-                            ->label(__('Pickup Longitude'))
+                            ->label('خط طول نقطة الانطلاق')
                             ->numeric()
                             ->step(0.00000001)
                             ->rules(['nullable', 'numeric', 'between:-180,180']),
                         Forms\Components\Textarea::make('pickup_address')
-                            ->label(__('Pickup Address'))
+                            ->label('عنوان نقطة الانطلاق')
                             ->rows(2),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('Dropoff Information'))
+                Forms\Components\Section::make('معلومات نقطة الوصول')
                     ->schema([
                         Forms\Components\TextInput::make('dropoff_lat')
-                            ->label(__('Dropoff Latitude'))
+                            ->label('خط عرض نقطة الوصول')
                             ->numeric()
                             ->step(0.00000001)
                             ->rules(['nullable', 'numeric', 'between:-90,90']),
                         Forms\Components\TextInput::make('dropoff_long')
-                            ->label(__('Dropoff Longitude'))
+                            ->label('خط طول نقطة الوصول')
                             ->numeric()
                             ->step(0.00000001)
                             ->rules(['nullable', 'numeric', 'between:-180,180']),
                         Forms\Components\Textarea::make('dropoff_address')
-                            ->label(__('Dropoff Address'))
+                            ->label('عنوان نقطة الوصول')
                             ->rows(2),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('Trip Details'))
+                Forms\Components\Section::make('تفاصيل الرحلة')
                     ->schema([
                         Forms\Components\TextInput::make('distance')
-                            ->label(__('Distance (km)'))
+                            ->label('المسافة (كم)')
                             ->numeric()
                             ->step(0.01)
                             ->suffix('km'),
                         Forms\Components\TextInput::make('estimated_duration')
-                            ->label(__('Estimated Duration (minutes)'))
+                            ->label('المدة المقدرة (دقائق)')
                             ->numeric()
-                            ->suffix(__('minutes')),
+                            ->suffix('دقائق'),
                         Forms\Components\TextInput::make('actual_duration')
-                            ->label(__('Actual Duration (minutes)'))
+                            ->label('المدة الفعلية (دقائق)')
                             ->numeric()
-                            ->suffix(__('minutes')),
+                            ->suffix('دقائق'),
                         Forms\Components\TextInput::make('estimated_fare')
-                            ->label(__('Estimated Fare'))
+                            ->label('الأجرة المقدرة')
                             ->numeric()
                             ->step(0.01)
-                            ->prefix(__('SAR')),
+                            ->prefix('ريال'),
                         Forms\Components\TextInput::make('actual_fare')
-                            ->label(__('Actual Fare'))
+                            ->label('الأجرة الفعلية')
                             ->numeric()
                             ->step(0.01)
-                            ->prefix(__('SAR')),
+                            ->prefix('ريال'),
                         Forms\Components\TextInput::make('waiting_fee')
-                            ->label(__('Waiting Fee'))
+                            ->label('رسوم الانتظار')
                             ->numeric()
                             ->step(0.01)
                             ->default(0)
-                            ->prefix(__('SAR')),
+                            ->prefix('ريال'),
                         Forms\Components\TextInput::make('cancellation_fee')
-                            ->label(__('Cancellation Fee'))
+                            ->label('رسوم الإلغاء')
                             ->numeric()
                             ->step(0.01)
-                            ->prefix(__('SAR')),
+                            ->prefix('ريال'),
                     ])->columns(2),
 
-                Forms\Components\Section::make(__('Scheduling'))
+                Forms\Components\Section::make('الجدولة')
                     ->schema([
                         Forms\Components\Toggle::make('is_scheduled')
-                            ->label(__('Is Scheduled Trip')),
+                            ->label('رحلة مجدولة'),
                         Forms\Components\DatePicker::make('scheduled_date')
-                            ->label(__('Scheduled Date')),
+                            ->label('التاريخ المجدول'),
                         Forms\Components\TimePicker::make('scheduled_time')
-                            ->label(__('Scheduled Time')),
+                            ->label('الوقت المجدول'),
                         Forms\Components\DateTimePicker::make('scheduled_at')
-                            ->label(__('Scheduled At')),
+                            ->label('مجدولة في'),
                     ])->columns(2),
             ]);
     }
@@ -177,21 +210,21 @@ class TripResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('id')
-                    ->label(__('Trip ID'))
+                    ->label('رقم الرحلة')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('user.name')
-                    ->label(__('Rider'))
+                    ->label('الراكب')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('driver.user.name')
-                    ->label(__('Driver'))
+                    ->label('السائق')
                     ->searchable()
                     ->sortable()
-                    ->default(__('Not Assigned')),
+                    ->default('غير معين'),
                 BadgeColumn::make('status')
-                    ->label(__('Status'))
-                    ->formatStateUsing(fn ($state) => $state?->label() ?? __('Unknown'))
+                    ->label('الحالة')
+                    ->formatStateUsing(fn ($state) => static::tripStatusLabel($state))
                     ->colors([
                         'warning' => TripStatus::SEARCHING->value,
                         'info' => TripStatus::IN_ROUTE_TO_PICKUP->value,
@@ -205,7 +238,7 @@ class TripResource extends Resource
                         ],
                     ]),
                 TextColumn::make('pickup_address')
-                    ->label(__('Pickup'))
+                    ->label('نقطة الانطلاق')
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
@@ -216,7 +249,7 @@ class TripResource extends Resource
                     })
                     ->searchable(),
                 TextColumn::make('dropoff_address')
-                    ->label(__('Dropoff'))
+                    ->label('نقطة الوصول')
                     ->limit(30)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
@@ -227,49 +260,49 @@ class TripResource extends Resource
                     })
                     ->searchable(),
                 TextColumn::make('distance')
-                    ->label(__('Distance (km)'))
+                    ->label('المسافة (كم)')
                     ->sortable()
                     ->suffix(' km'),
                 TextColumn::make('actual_fare')
-                    ->label(__('Fare'))
+                    ->label('الأجرة')
                     ->money('SAR')
                     ->sortable(),
                 BadgeColumn::make('paymentMethod.name')
-                    ->label(__('Payment'))
+                    ->label('الدفع')
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->label(__('Created At'))
+                    ->label('تاريخ الإنشاء')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label(__('Status'))
+                    ->label('الحالة')
                     ->options(collect(TripStatus::cases())->mapWithKeys(fn($case) => [
-                        $case->value => $case->label()
+                        $case->value => static::tripStatusLabel($case)
                     ]))
                     ->multiple(),
                 SelectFilter::make('payment_method_id')
-                    ->label(__('Payment Method'))
+                    ->label('طريقة الدفع')
                     ->relationship('paymentMethod', 'name', fn($query) => $query->whereNotNull('name'))
                     ->searchable()
                     ->multiple(),
                 SelectFilter::make('type')
-                    ->label(__('Trip Type'))
+                    ->label('نوع الرحلة')
                     ->options([
-                        TripType::immediate->value => TripType::immediate->label(),
-                        TripType::scheduled->value => TripType::scheduled->label(),
+                        TripType::immediate->value => static::tripTypeLabel(TripType::immediate),
+                        TripType::scheduled->value => static::tripTypeLabel(TripType::scheduled),
                     ]),
                 Filter::make('is_scheduled')
                     ->query(fn (Builder $query): Builder => $query->where('is_scheduled', true))
-                    ->label(__('Scheduled Trips')),
+                    ->label('الرحلات المجدولة'),
                 Filter::make('created_at')
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label(__('Created From')),
+                            ->label('من تاريخ'),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label(__('Created Until')),
+                            ->label('إلى تاريخ'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -285,23 +318,23 @@ class TripResource extends Resource
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['created_from'] ?? null) {
-                            $indicators[] = 'Created from ' . \Carbon\Carbon::parse($data['created_from'])->toFormattedDateString();
+                            $indicators[] = 'من تاريخ ' . \Carbon\Carbon::parse($data['created_from'])->toFormattedDateString();
                         }
                         if ($data['created_until'] ?? null) {
-                            $indicators[] = 'Created until ' . \Carbon\Carbon::parse($data['created_until'])->toFormattedDateString();
+                            $indicators[] = 'إلى تاريخ ' . \Carbon\Carbon::parse($data['created_until'])->toFormattedDateString();
                         }
                         return $indicators;
                     }),
                 Filter::make('fare_range')
                     ->form([
                         Forms\Components\TextInput::make('min_fare')
-                            ->label(__('Min Fare'))
+                            ->label('الحد الأدنى للأجرة')
                             ->numeric()
-                            ->prefix(__('SAR')),
+                            ->prefix('ريال'),
                         Forms\Components\TextInput::make('max_fare')
-                            ->label(__('Max Fare'))
+                            ->label('الحد الأقصى للأجرة')
                             ->numeric()
-                            ->prefix(__('SAR')),
+                            ->prefix('ريال'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -315,12 +348,12 @@ class TripResource extends Resource
                             );
                     }),
                 SelectFilter::make('driver_id')
-                    ->label(__('Driver'))
+                    ->label('السائق')
                     ->relationship('driver.user', 'name', fn($query) => $query->whereNotNull('name'))
                     ->searchable()
                     ->preload(),
                 SelectFilter::make('zone_id')
-                    ->label(__('Zone'))
+                    ->label('المنطقة')
                     ->relationship('zone', 'name', fn($query) => $query->whereNotNull('name'))
                     ->searchable()
                     ->multiple(),
@@ -425,28 +458,28 @@ class TripResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make(__('Trip Information'))
+                Section::make('معلومات الرحلة')
                     ->icon('heroicon-o-map')
                     ->schema([
                         TextEntry::make('number')
-                            ->label(__('Trip ID')),
+                            ->label('رقم الرحلة'),
                         TextEntry::make('user.name')
-                            ->label(__('Rider')),
+                            ->label('الراكب'),
                         TextEntry::make('user.phone')
-                            ->label(__('Rider Phone'))
+                            ->label('هاتف الراكب')
                             ->icon('heroicon-o-phone'),
                         TextEntry::make('driver.user.name')
-                            ->label(__('Driver'))
-                            ->default(__('Not Assigned')),
+                            ->label('السائق')
+                            ->default('غير معين'),
                         TextEntry::make('driver.user.phone')
-                            ->label(__('Driver Phone'))
+                            ->label('هاتف السائق')
                             ->icon('heroicon-o-phone')
                             ->visible(fn ($record) => $record->driver_id !== null),
                         TextEntry::make('status')
-                            ->label(__('Status'))
+                            ->label('الحالة')
                             ->badge()
                             ->formatStateUsing(function ($state) {
-                                return $state?->label() ?? __('Unknown');
+                                return static::tripStatusLabel($state);
                             })
                             ->color(fn ($state) => match($state?->value ?? null) {
                                 TripStatus::SEARCHING->value => 'warning',
@@ -460,129 +493,129 @@ class TripResource extends Resource
                                 default => 'gray',
                             }),
                         TextEntry::make('type')
-                            ->label(__('Trip Type'))
+                            ->label('نوع الرحلة')
                             ->badge()
-                            ->formatStateUsing(fn ($state) => $state?->label() ?? __('Unknown'))
+                            ->formatStateUsing(fn ($state) => static::tripTypeLabel($state))
                             ->color(fn ($state) => match($state?->value ?? null) {
                                 TripType::immediate->value => 'info',
                                 TripType::scheduled->value => 'primary',
                                 default => 'gray',
                             }),
                         TextEntry::make('paymentMethod.name')
-                            ->label(__('Payment Method'))
+                            ->label('طريقة الدفع')
                             ->badge()
                             ->color('success'),
                         TextEntry::make('zone.name')
-                            ->label(__('Zone'))
-                            ->default(__('N/A')),
+                            ->label('المنطقة')
+                            ->default('غير متاح'),
                         TextEntry::make('vehicleType.name')
-                            ->label(__('Vehicle Type'))
-                            ->default(__('N/A')),
+                            ->label('نوع المركبة')
+                            ->default('غير متاح'),
                     ])->columns(2),
 
-                Section::make(__('Location Details'))
+                Section::make('تفاصيل الموقع')
                     ->icon('heroicon-o-map-pin')
                     ->schema([
                         TextEntry::make('pickup_address')
-                            ->label(__('Pickup Address'))
+                            ->label('عنوان نقطة الانطلاق')
                             ->columnSpanFull(),
                        
                         TextEntry::make('dropoff_address')
-                            ->label(__('Dropoff Address'))
+                            ->label('عنوان نقطة الوصول')
                             ->columnSpanFull(),
                        
                     ])->columns(2),
 
-                Section::make(__('Trip Metrics'))
+                Section::make('مقاييس الرحلة')
                     ->icon('heroicon-o-chart-bar')
                     ->schema([
                         TextEntry::make('distance')
-                            ->label(__('Distance'))
-                            ->formatStateUsing(fn ($state) => $state ? $state . ' km' : __('N/A'))
+                            ->label('المسافة')
+                            ->formatStateUsing(fn ($state) => $state ? $state . ' km' : 'غير متاح')
                             ->icon('heroicon-o-map'),
                         TextEntry::make('estimated_duration')
-                            ->label(__('Estimated Duration'))
-                            ->formatStateUsing(fn ($state) => $state ? $state . ' ' . __('minutes') : __('N/A'))
+                            ->label('المدة المقدرة')
+                            ->formatStateUsing(fn ($state) => $state ? $state . ' دقائق' : 'غير متاح')
                             ->icon('heroicon-o-clock'),
                         TextEntry::make('actual_duration')
-                            ->label(__('Actual Duration'))
+                            ->label('المدة الفعلية')
                             ->visible(fn($record) => $record->status === TripStatus::COMPLETED)
-                            ->formatStateUsing(fn ($state) => $state ? $state . ' ' . __('minutes') : __('N/A'))
+                            ->formatStateUsing(fn ($state) => $state ? $state . ' دقائق' : 'غير متاح')
                             ->icon('heroicon-o-clock'),
                         TextEntry::make('estimated_fare')
-                            ->label(__('Estimated Fare'))
+                            ->label('الأجرة المقدرة')
                             ->money('SAR'),
                         TextEntry::make('actual_fare')
-                            ->label(__('Actual Fare (Customer Pays)'))
+                            ->label('الأجرة الفعلية (ما يدفعه العميل)')
                             ->money('SAR')
                             ->getStateUsing(fn ($record) => $record->payment?->final_amount ?? $record->actual_fare)
                             ->visible(fn($record) => $record->status === TripStatus::COMPLETED || $record->payment !== null),
                         TextEntry::make('waiting_fee')
-                            ->label(__('Waiting Fee'))
+                            ->label('رسوم الانتظار')
                             ->money('SAR')
                             ->visible(fn($record) => $record->status === TripStatus::COMPLETED),
                         TextEntry::make('cancellation_fee')
-                            ->label(__('Cancellation Fee'))
+                            ->label('رسوم الإلغاء')
                             ->money('SAR')
                             ->visible(fn ($record) => $record->cancellation_fee > 0 && $record->status === TripStatus::COMPLETED),
                     ])->columns(3),
 
-                Section::make(__('Financial Details'))
+                Section::make('التفاصيل المالية')
                     ->icon('heroicon-o-currency-dollar')
                     ->schema([
                         TextEntry::make('gross_amount')
-                            ->label(__('Gross Amount (Before Coupon)'))
+                            ->label('المبلغ الإجمالي (قبل الكوبون)')
                             ->money('SAR')
                             ->getStateUsing(fn ($record) => $record->payment?->total_amount)
-                            ->default(__('N/A'))
+                            ->default('غير متاح')
                             ->visible(fn ($record) => $record->payment !== null),
                         TextEntry::make('final_amount')
-                            ->label(__('Final Amount (After Coupon)'))
+                            ->label('المبلغ النهائي (بعد الكوبون)')
                             ->money('SAR')
                             ->getStateUsing(fn ($record) => $record->payment?->final_amount ?? $record->payment?->total_amount)
-                            ->default(__('N/A'))
+                            ->default('غير متاح')
                             ->visible(fn ($record) => $record->payment !== null),
                         TextEntry::make('coupon_discount')
-                            ->label(__('Coupon Discount'))
+                            ->label('خصم الكوبون')
                             ->money('SAR')
                             ->getStateUsing(fn ($record) => $record->payment?->coupon_discount ?? 0)
                             ->default(0)
                             ->visible(fn ($record) => $record->payment && ($record->payment->coupon_discount ?? 0) > 0),
                         TextEntry::make('commission_rate')
-                            ->label(__('Commission Rate'))
+                            ->label('نسبة العمولة')
                             ->suffix('%')
                             ->getStateUsing(fn ($record) => $record->payment?->commission_rate)
-                            ->default(__('N/A'))
+                            ->default('غير متاح')
                             ->visible(fn ($record) => $record->payment !== null),
                         TextEntry::make('commission_amount')
-                            ->label(__('Platform Commission'))
+                            ->label('عمولة المنصة')
                             ->money('SAR')
                             ->getStateUsing(fn ($record) => $record->payment?->commission_amount)
-                            ->default(__('N/A'))
+                            ->default('غير متاح')
                             ->visible(fn ($record) => $record->payment !== null),
                         TextEntry::make('driver_earning')
-                            ->label(__('Driver Earnings'))
+                            ->label('أرباح السائق')
                             ->money('SAR')
                             ->getStateUsing(fn ($record) => $record->payment?->driver_earning)
-                            ->default(__('N/A'))
+                            ->default('غير متاح')
                             ->visible(fn ($record) => $record->payment !== null),
                         TextEntry::make('additional_fees')
-                            ->label(__('Additional Fees'))
+                            ->label('رسوم إضافية')
                             ->money('SAR')
                             ->getStateUsing(fn ($record) => $record->payment?->additional_fees ?? 0)
                             ->default(0)
                             ->visible(fn ($record) => $record->payment && ($record->payment->additional_fees ?? 0) > 0),
                         TextEntry::make('payment_status')
-                            ->label(__('Payment Status'))
+                            ->label('حالة الدفع')
                             ->badge()
                             ->getStateUsing(function ($record) {
                                 $status = $record->payment?->status;
                                 return match($status) {
-                                    0 => __('Pending'),
-                                    1 => __('Completed'),
-                                    2 => __('Failed'),
-                                    3 => __('Refunded'),
-                                    default => __('N/A'),
+                                    0 => 'قيد الانتظار',
+                                    1 => 'مكتمل',
+                                    2 => 'فشل',
+                                    3 => 'مسترد',
+                                    default => 'غير متاح',
                                 };
                             })
                             ->color(function ($record) {
@@ -599,66 +632,66 @@ class TripResource extends Resource
                     ])->columns(3)
                     ->visible(fn ($record) => $record->payment !== null),
 
-                Section::make(__('Trip Timeline'))
+                Section::make('الجدول الزمني للرحلة')
                     ->icon('heroicon-o-clock')
                     ->schema([
                         TextEntry::make('created_at')
-                            ->label(__('Trip Requested'))
+                            ->label('طلب الرحلة')
                             ->dateTime()
                             ->since(),
                         TextEntry::make('started_at')
-                            ->label(__('Trip Started'))
+                            ->label('بدء الرحلة')
                             ->dateTime()
                             ->since()
                             ->visible(fn ($record) => $record->started_at !== null),
                         TextEntry::make('arrived_at')
-                            ->label(__('Driver Arrived'))
+                            ->label('وصول السائق')
                             ->dateTime()
                             ->since()
                             ->visible(fn ($record) => $record->arrived_at !== null),
                         TextEntry::make('ended_at')
-                            ->label(__('Trip Ended'))
+                            ->label('انتهاء الرحلة')
                             ->dateTime()
                             ->since()
                             ->visible(fn ($record) => $record->ended_at !== null),
                         TextEntry::make('duration')
-                            ->label(__('Total Duration'))
+                            ->label('المدة الإجمالية')
                             ->getStateUsing(function ($record) {
                                 if ($record->started_at && $record->ended_at) {
                                     return $record->started_at->diffForHumans($record->ended_at, true);
                                 }
-                                return __('N/A');
+                                return 'غير متاح';
                             }),
                     ])->columns(2),
 
-                Section::make(__('Scheduling Information'))
+                Section::make('معلومات الجدولة')
                     ->icon('heroicon-o-calendar')
                     ->schema([
                         TextEntry::make('is_scheduled')
-                            ->label(__('Scheduled Trip'))
+                            ->label('رحلة مجدولة')
                             ->badge()
-                            ->formatStateUsing(fn (bool $state): string => $state ? __('Yes') : __('No'))
+                            ->formatStateUsing(fn (bool $state): string => $state ? 'نعم' : 'لا')
                             ->color(fn (bool $state): string => $state ? 'success' : 'gray'),
                         TextEntry::make('scheduled_date')
-                            ->label(__('Scheduled Date'))
+                            ->label('التاريخ المجدول')
                             ->date(),
                         TextEntry::make('scheduled_time')
-                            ->label(__('Scheduled Time'))
+                            ->label('الوقت المجدول')
                             ->time(),
                         TextEntry::make('scheduled_at')
-                            ->label(__('Scheduled DateTime'))
+                            ->label('التاريخ والوقت المجدول')
                             ->dateTime(),
                     ])->columns(2)
                     ->visible(fn ($record) => $record->is_scheduled),
 
-                Section::make(__('Timestamps'))
+                Section::make('التواريخ')
                     ->icon('heroicon-o-clock')
                     ->schema([
                         TextEntry::make('created_at')
-                            ->label(__('Created At'))
+                            ->label('تاريخ الإنشاء')
                             ->dateTime(),
                         TextEntry::make('updated_at')
-                            ->label(__('Updated At'))
+                            ->label('تاريخ التحديث')
                             ->dateTime(),
                     ])->columns(2)
                     ->collapsed(),
@@ -684,12 +717,12 @@ class TripResource extends Resource
 
     public static function getLabel(): string
     {
-        return __('Trip');
+        return 'الرحلة';
     }
 
     public static function getPluralLabel(): string
     {
-        return __('Trips');
+        return 'الرحلات';
     }
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder

@@ -15,11 +15,13 @@ class SetAdminLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Set Arabic locale for admin panel
+        // Set Arabic locale for admin panel - must also set session so filament-language-switch
+        // (which runs later and reads from session first) doesn't overwrite with stale 'en'
         if ($request->is('admin*')) {
             app()->setLocale('ar');
+            session(['locale' => 'ar']);
         }
-        
+
         return $next($request);
     }
 }

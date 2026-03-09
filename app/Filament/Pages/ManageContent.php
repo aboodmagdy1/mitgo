@@ -68,14 +68,14 @@ class ManageContent extends SettingsPage
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Settings');
+        return 'الإعدادات';
     }
     public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable{
-        return __('Manage Static Content');
+        return 'إدارة المحتوى الثابت';
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Manage Static Content');
+        return 'إدارة المحتوى الثابت';
     }
 }

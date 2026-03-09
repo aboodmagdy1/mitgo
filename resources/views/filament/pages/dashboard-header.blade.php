@@ -53,19 +53,19 @@
             class="flex items-center gap-2"
         >
             <label class="shrink-0 text-sm font-medium text-gray-600 dark:text-gray-400">
-                {{ __('dashboard.filter_preset') }}:
+                {{ 'الفترة' }}:
             </label>
             <select
                 x-model="preset"
                 x-on:change="onPresetChange()"
                 class="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-gray-950/5 transition hover:bg-gray-50 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-gray-600 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10 dark:focus:border-primary-500"
             >
-                <option value="none">{{ __('dashboard.filter_none') }}</option>
-                <option value="last_week">{{ __('dashboard.filter_last_week') }}</option>
-                <option value="last_month">{{ __('dashboard.filter_last_month') }}</option>
-                <option value="last_3_months">{{ __('dashboard.filter_last_3_months') }}</option>
-                <option value="last_year">{{ __('dashboard.filter_last_year') }}</option>
-                <option value="custom">{{ __('dashboard.filter_custom') }}</option>
+                <option value="none">{{ 'بدون فلتر' }}</option>
+                <option value="last_week">{{ 'آخر أسبوع' }}</option>
+                <option value="last_month">{{ 'آخر شهر' }}</option>
+                <option value="last_3_months">{{ 'آخر 3 أشهر' }}</option>
+                <option value="last_year">{{ 'آخر سنة' }}</option>
+                <option value="custom">{{ 'مخصص' }}</option>
             </select>
 
             <template x-if="preset === 'custom'">
@@ -86,7 +86,7 @@
                         x-on:click="applyFilter()"
                         class="rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-primary-500 dark:bg-primary-500 dark:hover:bg-primary-400"
                     >
-                        {{ __('dashboard.filter_apply') }}
+                        {{ 'تطبيق' }}
                     </button>
                 </div>
             </template>

@@ -177,52 +177,52 @@ class AdvancedDashboardStatsWidget extends BaseWidget
     private function buildStatsFromData(array $data): array
     {
         return [
-            Stat::make(__('stats.total_trips'), number_format($data['total_trips']))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.trips_in_period') : __('stats.all_time'))
+            Stat::make('إجمالي الرحلات', number_format($data['total_trips']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'طلبات الرحلات في الفترة المحددة' : 'الكل')
                 ->descriptionIcon('heroicon-m-map-pin')
                 ->color('primary'),
-            Stat::make(__('stats.active_trips'), number_format($data['active_trips']))
-                ->description(__('stats.scheduled_trips_count', ['count' => number_format($data['scheduled_trips'])]))
+            Stat::make('الرحلات النشطة', number_format($data['active_trips']))
+                ->description(str_replace(':count', number_format($data['scheduled_trips']), ':count رحلة مجدولة'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
-            Stat::make(__('stats.total_drivers'), number_format($data['total_drivers']))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.drivers_in_period') : __('stats.all_time'))
+            Stat::make('إجمالي السائقين', number_format($data['total_drivers']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'سائقين في الفترة المحددة' : 'الكل')
                 ->descriptionIcon('heroicon-m-user-circle')
                 ->color('success'),
-            Stat::make(__('stats.total_clients'), number_format($data['total_clients']))
-                ->description(__('stats.active_clients_count', ['count' => number_format($data['active_clients'])]))
+            Stat::make('إجمالي العملاء', number_format($data['total_clients']))
+                ->description(str_replace(':count', number_format($data['active_clients']), ':count عميل نشط'))
                 ->descriptionIcon('heroicon-m-users')
                 ->color('success'),
-            Stat::make(__('stats.completed_trips'), number_format($data['completed_trips']))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.completed_in_period') : __('stats.all_time'))
+            Stat::make('الرحلات المكتملة', number_format($data['completed_trips']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'مكتملة في الفترة المحددة' : 'الكل')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make(__('stats.cancelled_trips'), number_format($data['cancelled_trips']))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.cancelled_in_period') : __('stats.all_time'))
+            Stat::make('الرحلات الملغية', number_format($data['cancelled_trips']))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'ملغية في الفترة المحددة' : 'الكل')
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            Stat::make(__('stats.driver_acceptance_rate'), $this->formatTripRequestStats($data, 'acceptance'))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.trip_requests_in_period') : __('stats.all_time'))
+            Stat::make('معدل القبول', $this->formatTripRequestStats($data, 'acceptance'))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'طلبات الرحلات في الفترة المحددة' : 'الكل')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
-            Stat::make(__('stats.driver_rejection_rate'), $this->formatTripRequestStats($data, 'rejection'))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.trip_requests_in_period') : __('stats.all_time'))
+            Stat::make('معدل عدم القبول', $this->formatTripRequestStats($data, 'rejection'))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'طلبات الرحلات في الفترة المحددة' : 'الكل')
                 ->descriptionIcon('heroicon-m-x-circle')
                 ->color('danger'),
-            Stat::make(__('stats.total_revenue'), number_format($data['total_revenue'] ?? 0, 2))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.revenue_in_period_label') : __('stats.revenue_all_time_label'))
+            Stat::make('إجمالي الإيرادات', number_format($data['total_revenue'] ?? 0, 2))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'الإيرادات في الفترة المحددة' : 'إيرادات إجمالية')
                 ->descriptionIcon('heroicon-m-currency-dollar')
                 ->color('primary'),
-            Stat::make(__('stats.revenue_company_profit'), number_format($data['company_profit'] ?? 0, 2))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.profit_in_period') : __('stats.profit_all_time'))
+            Stat::make('أرباح الشركة', number_format($data['company_profit'] ?? 0, 2))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'الأرباح في الفترة المحددة' : 'أرباح إجمالية')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),
-            Stat::make(__('stats.driver_earnings'), number_format($data['driver_earnings'] ?? 0, 2))
-                ->description(DashboardDateFilter::hasActiveFilter() ? __('stats.earnings_in_period') : __('stats.earnings_all_time'))
+            Stat::make('أرباح السائقين', number_format($data['driver_earnings'] ?? 0, 2))
+                ->description(DashboardDateFilter::hasActiveFilter() ? 'أرباح في الفترة المحددة' : 'أرباح إجمالية')
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('success'),
-            Stat::make(__('stats.pending_payments'), number_format($data['pending_amount'] ?? 0, 2))
-                ->description(__('stats.pending_count_label', ['count' => number_format($data['pending_count'] ?? 0)]))
+            Stat::make('المدفوعات المعلقة', number_format($data['pending_amount'] ?? 0, 2))
+                ->description(str_replace(':count', number_format($data['pending_count'] ?? 0), 'عدد المعلقة: :count'))
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
         ];
@@ -232,12 +232,12 @@ class AdvancedDashboardStatsWidget extends BaseWidget
     {
         $total = $data['trip_request_total'] ?? 0;
         if ($total === 0) {
-            return __('stats.zero_requests');
+            return '0 طلبات';
         }
 
         $responded = $data['trip_request_responded'] ?? 0;
         if ($responded === 0) {
-            return __('stats.zero_requests');
+            return '0 طلبات';
         }
 
         $accepted = $data['trip_request_accepted'] ?? 0;

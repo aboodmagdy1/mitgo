@@ -29,7 +29,7 @@ class RevenueByZoneChart extends ApexChartWidget
 
     protected function getHeading(): ?string
     {
-        return __('financial.chart_revenue_by_zone');
+        return 'الإيرادات حسب المنطقة';
     }
 
     protected function getOptions(): array
@@ -43,7 +43,7 @@ class RevenueByZoneChart extends ApexChartWidget
                 'toolbar' => ['show' => false],
             ],
             'series' => [
-                ['name' => __('financial.revenue'), 'data' => $data['data']],
+                ['name' => 'الإيرادات', 'data' => $data['data']],
             ],
             'xaxis'       => ['categories' => $data['labels']],
             'colors'      => ['#8b5cf6'],

@@ -8,17 +8,17 @@ class DriverContactResource extends ContactResourceBase
 {
     public static function getNavigationLabel(): string
     {
-        return __('Drivers Section');
+        return 'قسم السائقين';
     }
 
     public static function getModelLabel(): string
     {
-        return __('Driver Contact Message');
+        return 'رسالة تواصل سائق';
     }
 
     public static function getPluralLabel(): ?string
     {
-        return __('Driver Contact Messages');
+        return 'رسائل تواصل السائقين';
     }
 
     public static function getNavigationSort(): ?int

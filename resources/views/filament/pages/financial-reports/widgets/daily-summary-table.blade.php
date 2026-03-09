@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     <x-filament::section>
         <x-slot name="heading">
-            {{ __('financial.daily_summary_title') }}
+            {{ 'الملخص المالي اليومي' }}
         </x-slot>
 
         <x-slot name="headerEnd">
@@ -13,7 +13,7 @@
                     size="sm"
                     icon="heroicon-m-table-cells"
                 >
-                    {{ __('financial.export_excel') }}
+                    {{ 'تصدير Excel' }}
                 </x-filament::button>
 
                 <x-filament::button
@@ -23,7 +23,7 @@
                     size="sm"
                     icon="heroicon-m-document-arrow-down"
                 >
-                    {{ __('financial.export_pdf') }}
+                    {{ 'تصدير PDF' }}
                 </x-filament::button>
             </div>
         </x-slot>
@@ -33,15 +33,15 @@
                 <thead class="bg-gray-50 dark:bg-gray-800">
                     <tr>
                         @foreach([
-                            'date'               => __('financial.col_date'),
-                            'total_trips'        => __('financial.col_total_trips'),
-                            'total_revenue'      => __('financial.col_total_revenue'),
-                            'commission'         => __('financial.col_commission'),
-                            'driver_earnings'    => __('financial.col_driver_earnings'),
-                            'coupon_discounts'   => __('financial.col_coupon_discounts'),
-                            'cancellation_fees'  => __('financial.col_cancellation_fees'),
-                            'waiting_fees'       => __('financial.col_waiting_fees'),
-                            'net_revenue'        => __('financial.col_net_revenue'),
+                            'date'               => 'التاريخ',
+                            'total_trips'        => 'الرحلات',
+                            'total_revenue'      => 'إجمالي الإيرادات',
+                            'commission'         => 'العمولة',
+                            'driver_earnings'    => 'أرباح السائقين',
+                            'coupon_discounts'   => 'خصومات الكوبونات',
+                            'cancellation_fees'  => 'رسوم الإلغاء',
+                            'waiting_fees'       => 'رسوم الانتظار',
+                            'net_revenue'        => 'صافي الإيرادات',
                         ] as $col => $label)
                         <th
                             wire:click="sortBy('{{ $col }}')"
@@ -80,7 +80,7 @@
                     @empty
                         <tr>
                             <td colspan="9" class="px-4 py-10 text-center text-gray-400 dark:text-gray-600">
-                                {{ __('financial.no_data_for_period') }}
+                                {{ 'لا توجد بيانات للفترة المحددة' }}
                             </td>
                         </tr>
                     @endforelse
@@ -89,7 +89,7 @@
                 @if($totalRows > 0)
                 <tfoot class="bg-gray-100 dark:bg-gray-800/70 border-t-2 border-gray-300 dark:border-gray-600">
                     <tr>
-                        <td class="px-4 py-3 font-bold text-gray-900 dark:text-white">{{ __('financial.total') }}</td>
+                        <td class="px-4 py-3 font-bold text-gray-900 dark:text-white">{{ 'الإجمالي' }}</td>
                         <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">{{ number_format($totals->total_trips) }}</td>
                         <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">SAR {{ number_format($totals->total_revenue, 2) }}</td>
                         <td class="px-4 py-3 text-right font-bold text-blue-700 dark:text-blue-300">SAR {{ number_format($totals->commission, 2) }}</td>
@@ -108,11 +108,7 @@
         @if($totalPages > 1)
         <div class="mt-4 flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
             <p>
-                {{ __('financial.showing_rows', [
-                    'from' => (($currentPage - 1) * $perPage) + 1,
-                    'to'   => min($currentPage * $perPage, $totalRows),
-                    'total' => $totalRows,
-                ]) }}
+                {{ 'عرض ' . ((($currentPage - 1) * $perPage) + 1) . '–' . min($currentPage * $perPage, $totalRows) . ' من أصل ' . $totalRows . ' صف' }}
             </p>
             <div class="flex items-center gap-2">
                 <x-filament::button
@@ -122,7 +118,7 @@
                     color="gray"
                     icon="heroicon-m-chevron-left"
                 >
-                    {{ __('financial.prev') }}
+                    {{ 'السابق' }}
                 </x-filament::button>
 
                 <span class="px-3 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 font-medium">
@@ -136,13 +132,13 @@
                     color="gray"
                     icon-after="heroicon-m-chevron-right"
                 >
-                    {{ __('financial.next') }}
+                    {{ 'التالي' }}
                 </x-filament::button>
             </div>
         </div>
         @else
         <div class="mt-3 text-right text-xs text-gray-400 dark:text-gray-600">
-            {{ __('financial.total_rows', ['total' => $totalRows]) }}
+            {{ $totalRows . ' صف' }}
         </div>
         @endif
     </x-filament::section>
