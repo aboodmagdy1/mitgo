@@ -95,7 +95,7 @@ class DriverService extends BaseService
         // Create driver vehicle data 
         $vdata = [
             'driver_id' => $driver->id,
-            'seats' => (int)$data['seats'],
+            'seats' => !empty($data['seats'])?$data['seats']:null ,
             'color' => $data['color'],
             'license_number' => $data['car_license_number'],
             'plate_number' => $data['plate_number'],

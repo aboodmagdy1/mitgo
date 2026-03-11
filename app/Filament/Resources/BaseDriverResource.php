@@ -268,20 +268,24 @@ abstract class BaseDriverResource extends Resource
                                 ->send();
                             return;
                         }
-                        if (! empty($data['vehicle_type_id'])) {
-                            if ($record->vehicle) {
-                                $record->vehicle->update(['vehicle_type_id' => $data['vehicle_type_id']]);
-                            } else {
-                                $record->vehicle()->create([
-                                    'vehicle_type_id'        => $data['vehicle_type_id'],
-                                    'seats'                  => 4,
-                                    'color'                  => null,
-                                    'license_number'         => null,
-                                    'plate_number'           => null,
-                                    'vehicle_brand_model_id' => null,
-                                ]);
-                            }
+                        $vechileType = VehicleType::find($data['vehicle_type_id']);
+                        // Update vehicle type if provided and driver has a vehicle
+                        if (!empty($data['vehicle_type_id']) && $record->vehicle) {
+                            $record->vehicle->update(['vehicle_type_id' => $data['vehicle_type_id'] , 'seats'=>$vechileType->seats]);
+                        } elseif (!empty($data['vehicle_type_id']) && !$record->vehicle) {
+
+                            // Create vehicle if doesn't exist
+                            $record->vehicle()->create([
+                                'vehicle_type_id' => $data['vehicle_type_id'],
+                                'seats' =>$vechileType->seats  , // Default seats
+                                'color' => null,
+                                'license_number' => null,
+                                'plate_number' => null,
+                                'vehicle_brand_model_id' => null,
+                            ]);
                         }
+                        
+
                         // Activate user on approval
                         $record->user->update(['is_active' => true]);
                         \Filament\Notifications\Notification::make()
