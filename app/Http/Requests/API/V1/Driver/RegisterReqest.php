@@ -30,7 +30,7 @@ class RegisterReqest extends FormRequest
             'national_id' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
             'city_id' => 'required|integer|exists:cities,id',
-            'seats' => 'required|string',
+            'seats' => 'nullable|string',
             'color' => 'required|string|max:255',
             'plate_number' => 'required|string|max:255',
             'car_license_number' => 'required|string|max:255',

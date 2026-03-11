@@ -61,9 +61,10 @@ class ViewDriver extends ViewRecord
                             $record->vehicle->update(['vehicle_type_id' => $data['vehicle_type_id']]);
                         } elseif (!empty($data['vehicle_type_id']) && !$record->vehicle) {
                             // Create vehicle if doesn't exist
+                            $vechileType = VehicleType::find($data['vehicle_type_id']);
                             $record->vehicle()->create([
                                 'vehicle_type_id' => $data['vehicle_type_id'],
-                                'seats' => 4, // Default seats
+                                'seats' =>$vechileType->seats  , // Default seats
                                 'color' => null,
                                 'license_number' => null,
                                 'plate_number' => null,
